@@ -221,7 +221,7 @@ HTTPS       Tests    Android    E2E       Docs
 
 **Phase 1b — unit tests:**
 
-![Phase 1b execution — Jest tests passing](<../imgs/fase 1.b>)
+![Phase 1b execution — Jest tests passing](<../imgs/fase 1b.png>)
 
 ---
 
