@@ -1,0 +1,37 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Debug Expo App",
+            "request": "launch",
+            "type": "reactnative",
+            "cwd": "${workspaceFolder}",
+            "platform": "android",
+            "target": "simulator",
+            "envFile": "${workspaceFolder}/.env",
+            "sourceMaps": true,
+            "enableDebug": true
+        },
+        {
+            "name": "Debug iOS",
+            "request": "launch",
+            "type": "reactnative",
+            "cwd": "${workspaceFolder}",
+            "platform": "ios",
+            "target": "simulator",
+            "envFile": "${workspaceFolder}/.env",
+            "sourceMaps": true,
+            "enableDebug": true
+        },
+        {
+            "name": "Debug in Expo Go",
+            "request": "launch",
+            "type": "reactnative",
+            "cwd": "${workspaceFolder}",
+            "platform": "exponent",
+            "expoHostType": "local",
+            "sourceMaps": true,
+            "enableDebug": true
+        }
+    ]
+} 
