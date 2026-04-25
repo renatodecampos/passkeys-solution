@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "passkeys-app",
+    "name": "Passkey Demo",
     "owner": "renatocampos",
     "description": "Passkeys app",
     "sdkVersion": "53.0.0",
@@ -8,15 +8,16 @@
     "orientation": "portrait",
     "locales": {
       "en": {
-        "name": "Passkeys App",
+        "name": "Passkey Demo",
         "description": "Passkeys app"
       },
       "pt-BR": {
-        "name": "Passkeys App",
+        "name": "Passkey Demo",
         "description": "Passkeys app"
       }
     },
     "icon": "./assets/images/icon.png",
+    "backgroundColor": "#F8FAFC",
     "scheme": "passkeysapp",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
@@ -31,7 +32,7 @@
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
+        "backgroundColor": "#F8FAFC"
       },
       "edgeToEdgeEnabled": true,
       "package": "com.renatocampos.passkeysapp",
@@ -51,7 +52,7 @@
           "image": "./assets/images/splash-icon.png",
           "imageWidth": 200,
           "resizeMode": "contain",
-          "backgroundColor": "#ffffff"
+          "backgroundColor": "#F8FAFC"
         }
       ]
     ],
