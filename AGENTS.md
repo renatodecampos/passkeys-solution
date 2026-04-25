@@ -110,6 +110,12 @@ If a subtask is blocked:
 
 A phase is complete only when **all completion criteria** listed in the status file are verified. Do not mark the phase complete before that.
 
+Before setting **Phase status** to `[x] completed`, the agent **must** ask the user:
+
+> "Phase complete. How many tokens were consumed and what % of the context window was used?"
+
+Record the reported values in the `## Token usage` table of the phase file. This is required — do not skip it even if the user does not reply immediately.
+
 ### On-disk precondition check
 
 Before declaring a phase blocked on a precondition, **read the previous phase file on disk** and confirm the real status. It may already be `[x] completed` even if the orchestrator did not get explicit confirmation (lesson: RFC-0002 phase 3).

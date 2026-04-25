@@ -99,7 +99,10 @@ The phase is complete only when this command produces the expected output.
 <!-- Add further batches as needed -->
 
 ### Wrap-up
-- All done → set **Phase status** to `[x] completed` with **Completed at**
+- All done and completion criterion verified → ask the user:
+  > "Phase complete. How many tokens were consumed and what % of the context window was used?"
+  Then fill **## Token usage** with the reported values.
+- Set **Phase status** to `[x] completed` with **Completed at**
 - Any block → set **Phase status** to `[!] blocked` and record under Blockers
 
 ---
@@ -140,10 +143,12 @@ _Free form for the agent to record observations during execution._
 
 ## Token usage
 
-> Fill with the value shown in the Claude Code or Cursor UI at the end of the phase.
+> **Required** — the agent must ask the user before marking the phase `[x] completed`:
+> *"Phase complete. How many tokens were consumed and what % of the context window was used?"*
 
 | Field | Value |
 |-------|-------|
 | Tool | — |
 | Tokens consumed | — |
+| Context window % | — |
 | Notes | — |
