@@ -23,6 +23,11 @@ const generateSessionKey = () => {
     return crypto.randomBytes(32).toString('hex');
 };
 
+/** Erros esperados do domínio WebAuthn (cliente) — não são falha do servidor */
+const httpStatusForAuthDomainError = (err: Error): number => {
+    return err.message === 'User not found' ? 400 : 500;
+};
+
 // Define endpoints
 export const defineEndpoints = (server: FastifyInstance) => {
     server.get('/health', async () => {
@@ -99,7 +104,7 @@ export const defineEndpoints = (server: FastifyInstance) => {
             reply.send(authenticationOptions);
         } catch (error) {
             const _error = error as Error;
-            reply.status(500).send({ error: _error.message });
+            reply.status(httpStatusForAuthDomainError(_error)).send({ error: _error.message });
         }
     });
 
@@ -123,7 +128,7 @@ export const defineEndpoints = (server: FastifyInstance) => {
             reply.send({ verified });
         } catch (error) {
             const _error = error as Error;
-            reply.status(500).send({ error: _error.message });
+            reply.status(httpStatusForAuthDomainError(_error)).send({ error: _error.message });
         }
     });
 
