@@ -105,6 +105,7 @@ The phase is complete only when this command produces the expected output.
   1. Fill **## Token usage** in this file with the reported values
   2. Add or update the corresponding row in the **Token summary** table in `tasks/feedback-forward.md`
   3. Recalculate the **Total tokens tracked** line in that table
+  4. If context % > 75%: add a post-mortem row to the **Context window analysis → Post-mortems** section in `tasks/feedback-forward.md` and answer the four root cause questions
 - Set **Phase status** to `[x] completed` with **Completed at**
 - Any block → set **Phase status** to `[!] blocked` and record under Blockers
 - If the phase completed successfully and a next phase exists, display to the user:

@@ -118,6 +118,8 @@ Record the reported values in the `## Token usage` table of the phase file and u
 
 **Context window limit:** plan to finish or hand off the phase before **75%** of the context window is consumed. Above that, the risk of silent errors (dropped instructions, wrong file edited) increases meaningfully.
 
+If the user reports usage **above 75%**, add a post-mortem row to the **Context window analysis** section in `tasks/feedback-forward.md` and answer the four root cause questions before marking the phase `[x] completed`.
+
 After filling token usage, display the next step to the user:
 
 - If a next phase exists:

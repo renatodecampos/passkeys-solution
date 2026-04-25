@@ -243,3 +243,42 @@
 | **Tooling** | Pin CLI flag versions in the spec (e.g. `--testPathPatterns` in Jest v29) | Low |
 | **Architecture** | Define app route structure (which file is authenticated home) in the RFC, not only in a phase | High |
 | **Blockers** | Phase with 3+ resolved blockers = prior phase spec had gaps; review template to require stricter preconditions | High |
+
+---
+
+## Context window analysis
+
+> **Limit: ≤ 75%.** When a phase exceeds this threshold, the agent must fill the post-mortem
+> below so the harness can be improved to prevent recurrence.
+
+### Thresholds
+
+| Usage | Signal | Action |
+|-------|--------|--------|
+| ≤ 60% | Healthy | No action |
+| 61–75% | Acceptable | Note what drove usage; watch for patterns |
+| 76–85% | Over limit | Fill post-mortem below; split phase or reduce reads in spec |
+| > 85% | Critical | Phase should have been split earlier; mandatory post-mortem |
+
+### Post-mortems (phases that exceeded 75%)
+
+> When a phase finishes above 75%, add a row here and answer the four questions below the table.
+
+| RFC | Phase | Context % | Root cause summary |
+|-----|-------|-----------|-------------------|
+| — | — | — | — |
+
+**Root cause questions (answer for each row above):**
+
+1. **What drove context growth?** _(e.g. large file reads, many iteration rounds, long error logs)_
+2. **Was it avoidable?** _(Could the spec have scoped the phase more narrowly? Were unnecessary files read?)_
+3. **What should change in the spec or template?** _(Concrete suggestion: split into two phases, limit file reads, pre-summarize inputs)_
+4. **Applied where?** _(File and section that received the improvement)_
+
+### Patterns to watch
+
+> Filled by the Documentation phase agent after reviewing post-mortems.
+
+| Pattern | Phases affected | Mitigation applied |
+|---------|-----------------|--------------------|
+| — | — | — |
