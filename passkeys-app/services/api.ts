@@ -9,10 +9,24 @@ async function postJSON(path: string, body?: unknown, headers?: Record<string, s
     },
     body: body !== undefined ? JSON.stringify(body) : undefined,
   });
+
+  const text = await res.text();
   if (!res.ok) {
-    throw new Error(`HTTP ${res.status}`);
+    let suffix = '';
+    try {
+      const errObj = JSON.parse(text) as { error?: string };
+      if (errObj.error) {
+        suffix = `: ${errObj.error}`;
+      }
+    } catch {
+      /* keep suffix empty for non-JSON error bodies */
+    }
+    throw new Error(`HTTP ${res.status}${suffix}`);
   }
-  return res.json();
+  if (!text) {
+    return null;
+  }
+  return JSON.parse(text) as unknown;
 }
 
 export async function generateRegistrationOptions(username: string): Promise<unknown> {

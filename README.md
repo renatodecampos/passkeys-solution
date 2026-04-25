@@ -26,6 +26,7 @@ It is also a **structured engineering experiment**: the entire development was o
 - **Authentication** — signs in with a biometric challenge, zero passwords
 - **HTTPS locally** — self-signed certificate via `mkcert`; no paid cert required for development
 - **Android support** — native passkey flow via `react-native-passkey` on API 34+ emulator
+- **Demo UX (RFC-0002)** — Calm Card entry, keyboard-safe form, inline status messages, “Home Proof” screen summarizing server verification
 - **100% statement coverage** on the server, 84% branch coverage (threshold: 80%)
 - **Session security** — signed cookies, Helmet headers, CORS, rate limiting
 
@@ -47,9 +48,13 @@ passkeys-solution/
 │       └── types/
 └── passkeys-app/           # Expo + React Native (Android)
     └── app/
-        ├── (tabs)/         # Tab navigation (Expo Router)
+        ├── index.tsx       # Public entry (register / sign in — RFC-0002 UX)
+        ├── home.tsx        # Authenticated “Home Proof” (RFC-0002)
+        ├── (tabs)/         # Extra routes (e.g. explore)
         └── _layout.tsx
 ```
+
+App-specific setup and demo steps: [`passkeys-app/README.md`](passkeys-app/README.md).
 
 **WebAuthn flow:**
 
@@ -216,7 +221,8 @@ This project was built entirely by AI agents coordinated through a **file-based 
 
 - [`AGENTS.md`](AGENTS.md) — architecture rules and agent conventions
 - [`CLAUDE.md`](CLAUDE.md) — onboarding for any new agent (or developer)
-- [`rfcs/completed/RFC-0001`](rfcs/completed/RFC-0001-passkeys-poc-completion.md) — full specification
+- [`rfcs/completed/RFC-0001`](rfcs/completed/RFC-0001-passkeys-poc-completion.md) — base PoC specification
+- [`rfcs/completed/RFC-0002`](rfcs/completed/RFC-0002-ux-passkeys-poc.md) — Android UX evolution (concluída)
 - [`tasks/`](tasks/README.md) — phase execution status
 
 **[Read the full presentation →](docs/harness-presentation.md)**
@@ -225,6 +231,8 @@ This project was built entirely by AI agents coordinated through a **file-based 
 
 ## Project Status
 
+**RFC-0001** (base PoC)
+
 | Phase | Description | Status |
 |---|---|---|
 | Phase 1 | HTTPS server + infrastructure | ✅ completed |
@@ -232,6 +240,14 @@ This project was built entirely by AI agents coordinated through a **file-based 
 | Phase 2 | Android app + passkey flow | ✅ completed |
 | Phase 3 | E2E integration + emulator certs | ✅ completed |
 | Phase 4 | Documentation | ✅ completed |
+
+**RFC-0002** (Android UX)
+
+| Phase | Description | Status |
+|---|---|---|
+| 1 | UX do app (Calm Card, Home Proof) | ✅ completed |
+| 2 | Validação UX e E2E | ✅ completed |
+| 3 | Documentação + RFC em `rfcs/completed/` | ✅ completed |
 
 ---
 

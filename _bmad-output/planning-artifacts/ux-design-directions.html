@@ -1,0 +1,402 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Passkeys POC - UX Design Directions</title>
+  <style>
+    :root {
+      --bg: #f8fafc;
+      --surface: #ffffff;
+      --text: #0f172a;
+      --muted: #475569;
+      --border: #cbd5e1;
+      --primary: #2563eb;
+      --primary-pressed: #1d4ed8;
+      --success: #16a34a;
+      --error: #dc2626;
+      --info-surface: #eff6ff;
+      --error-surface: #fef2f2;
+      --radius: 14px;
+      --shadow: 0 18px 45px rgba(15, 23, 42, 0.08);
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.45;
+    }
+    header {
+      padding: 40px 24px 20px;
+      text-align: center;
+    }
+    header p { color: var(--muted); margin: 8px auto 0; max-width: 760px; }
+    h1 { margin: 0; font-size: 32px; letter-spacing: -0.04em; }
+    h2 { margin: 0 0 8px; font-size: 20px; letter-spacing: -0.02em; }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 24px;
+      padding: 24px;
+      max-width: 1280px;
+      margin: 0 auto 48px;
+    }
+    .direction {
+      background: var(--surface);
+      border: 1px solid rgba(203, 213, 225, 0.8);
+      border-radius: 24px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+    .direction-meta {
+      padding: 20px 20px 0;
+    }
+    .direction-meta p { margin: 0 0 18px; color: var(--muted); font-size: 14px; }
+    .phone {
+      width: 300px;
+      min-height: 590px;
+      margin: 0 auto 24px;
+      border: 10px solid #0f172a;
+      border-radius: 34px;
+      background: var(--surface);
+      overflow: hidden;
+      box-shadow: 0 16px 32px rgba(15, 23, 42, 0.18);
+    }
+    .screen {
+      min-height: 570px;
+      padding: 28px 22px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 16px;
+    }
+    .eyebrow {
+      color: var(--primary);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+    .title {
+      margin: 0;
+      font-size: 28px;
+      line-height: 1.05;
+      letter-spacing: -0.05em;
+    }
+    .copy { color: var(--muted); margin: 0; font-size: 15px; }
+    label { font-size: 13px; color: var(--muted); font-weight: 600; }
+    .input {
+      height: 50px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 0 14px;
+      display: flex;
+      align-items: center;
+      color: var(--text);
+      background: #fff;
+      font-size: 15px;
+    }
+    .button {
+      height: 50px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 15px;
+    }
+    .primary { background: var(--primary); color: white; }
+    .secondary { border: 1px solid var(--border); color: var(--primary); background: #fff; }
+    .status {
+      padding: 12px;
+      border-radius: 12px;
+      font-size: 13px;
+      color: #1e3a8a;
+      background: var(--info-surface);
+      border: 1px solid #bfdbfe;
+    }
+    .success {
+      color: #14532d;
+      background: #f0fdf4;
+      border-color: #bbf7d0;
+    }
+    .actions { display: grid; gap: 10px; }
+    .pill {
+      align-self: flex-start;
+      padding: 7px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 700;
+      background: var(--info-surface);
+      color: var(--primary);
+    }
+    .split { justify-content: space-between; }
+    .secure-card {
+      padding: 16px;
+      border-radius: 18px;
+      background: #f8fafc;
+      border: 1px solid var(--border);
+    }
+    .secure-card strong { display: block; margin-bottom: 4px; }
+    .home-badge {
+      width: 72px;
+      height: 72px;
+      border-radius: 22px;
+      background: var(--info-surface);
+      display: grid;
+      place-items: center;
+      color: var(--primary);
+      font-size: 30px;
+      font-weight: 800;
+    }
+
+    .direction-2 .screen { background: linear-gradient(180deg, #eff6ff, #ffffff 42%); }
+    .direction-2 .title { color: #1e3a8a; }
+    .direction-3 .screen { justify-content: flex-start; padding-top: 42px; }
+    .direction-3 .secure-card { margin-top: auto; }
+    .direction-4 .screen { background: #0f172a; color: #fff; }
+    .direction-4 .copy, .direction-4 label { color: #cbd5e1; }
+    .direction-4 .input { background: #1e293b; color: #fff; border-color: #334155; }
+    .direction-4 .secondary { background: transparent; border-color: #475569; color: #bfdbfe; }
+    .direction-5 .screen { justify-content: flex-start; }
+    .direction-5 .hero { background: #eff6ff; margin: -28px -22px 4px; padding: 40px 22px 26px; border-bottom: 1px solid #bfdbfe; }
+    .direction-6 .screen { justify-content: space-between; }
+    .direction-6 .bottom-sheet {
+      margin: 0 -10px -12px;
+      padding: 18px;
+      border-radius: 24px;
+      background: #fff;
+      border: 1px solid var(--border);
+      box-shadow: 0 -8px 24px rgba(15, 23, 42, 0.08);
+    }
+    .direction-7 .screen {
+      justify-content: flex-start;
+      padding: 18px 18px 0;
+      gap: 10px;
+      background: linear-gradient(180deg, #ffffff 0%, #f8fafc 68%);
+    }
+    .direction-7 .title { font-size: 23px; letter-spacing: -0.04em; }
+    .direction-7 .copy { font-size: 13px; }
+    .direction-7 .input {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+    }
+    .keyboard-note {
+      display: grid;
+      grid-template-columns: 8px 1fr;
+      gap: 10px;
+      align-items: start;
+      padding: 10px 12px;
+      border-radius: 12px;
+      background: var(--info-surface);
+      color: #1e3a8a;
+      font-size: 12px;
+      border: 1px solid #bfdbfe;
+    }
+    .keyboard-note::before {
+      content: "";
+      width: 8px;
+      height: 8px;
+      margin-top: 5px;
+      border-radius: 999px;
+      background: var(--primary);
+    }
+    .keyboard {
+      margin: auto -18px 0;
+      padding: 10px 10px 14px;
+      background: #dbe3ee;
+      border-top: 1px solid #cbd5e1;
+    }
+    .keyboard-row {
+      display: grid;
+      grid-template-columns: repeat(10, 1fr);
+      gap: 5px;
+      margin-bottom: 6px;
+    }
+    .keyboard-row.middle {
+      grid-template-columns: 0.5fr repeat(9, 1fr) 0.5fr;
+    }
+    .keyboard-row.bottom {
+      grid-template-columns: 1.4fr repeat(7, 1fr) 1.4fr;
+    }
+    .key {
+      height: 25px;
+      border-radius: 6px;
+      background: #fff;
+      box-shadow: 0 1px 0 rgba(15, 23, 42, 0.14);
+    }
+    .space-key {
+      grid-column: span 4;
+      height: 26px;
+      border-radius: 7px;
+      background: #fff;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Passkeys POC - UX Design Directions</h1>
+    <p>Seven focused visual directions for a calm, confident, direct Android passkey proof-of-concept.</p>
+  </header>
+
+  <main class="grid">
+    <section class="direction direction-1">
+      <div class="direction-meta">
+        <h2>1. Calm Card</h2>
+        <p>Centered, minimal, demo-safe. Best default for implementation.</p>
+      </div>
+      <div class="phone"><div class="screen">
+        <div class="eyebrow">Passkeys POC</div>
+        <h3 class="title">Sign in without a password</h3>
+        <p class="copy">Create a passkey once, then return using Android's secure prompt.</p>
+        <label>Username</label>
+        <div class="input">renato</div>
+        <div class="actions">
+          <div class="button primary">Create passkey</div>
+          <div class="button secondary">Sign in with passkey</div>
+        </div>
+        <div class="status">Android will ask you to confirm the passkey.</div>
+      </div></div>
+    </section>
+
+    <section class="direction direction-2">
+      <div class="direction-meta">
+        <h2>2. Secure Gradient</h2>
+        <p>Slightly more polished, good for stakeholder demos.</p>
+      </div>
+      <div class="phone"><div class="screen">
+        <span class="pill">Secure local demo</span>
+        <h3 class="title">Your device is the key.</h3>
+        <p class="copy">Use this emulator to create and reuse a passkey against localhost.</p>
+        <label>Username</label>
+        <div class="input">renato</div>
+        <div class="actions">
+          <div class="button primary">Continue with passkey</div>
+          <div class="button secondary">Create first</div>
+        </div>
+        <div class="status success">Ready: HTTPS local server connected.</div>
+      </div></div>
+    </section>
+
+    <section class="direction direction-3">
+      <div class="direction-meta">
+        <h2>3. Technical Proof</h2>
+        <p>More explicit setup status for engineers validating the stack.</p>
+      </div>
+      <div class="phone"><div class="screen">
+        <div class="eyebrow">WebAuthn proof</div>
+        <h3 class="title">Passkey flow check</h3>
+        <p class="copy">Register, logout, then sign in again with the same username.</p>
+        <label>Username</label>
+        <div class="input">renato</div>
+        <div class="actions">
+          <div class="button primary">Register passkey</div>
+          <div class="button secondary">Authenticate</div>
+        </div>
+        <div class="secure-card">
+          <strong>Local prerequisites</strong>
+          <p class="copy">HTTPS, mkcert CA, Redis, MongoDB, adb reverse.</p>
+        </div>
+      </div></div>
+    </section>
+
+    <section class="direction direction-4">
+      <div class="direction-meta">
+        <h2>4. Dark Trust</h2>
+        <p>Secure and high-contrast, but heavier than the desired calm default.</p>
+      </div>
+      <div class="phone"><div class="screen">
+        <div class="eyebrow">Passkeys</div>
+        <h3 class="title">No password stored here.</h3>
+        <p class="copy">Android confirms the secure step. This app verifies the result.</p>
+        <label>Username</label>
+        <div class="input">renato</div>
+        <div class="actions">
+          <div class="button primary">Create passkey</div>
+          <div class="button secondary">Sign in</div>
+        </div>
+        <div class="status">Waiting for Android Credential Manager.</div>
+      </div></div>
+    </section>
+
+    <section class="direction direction-5">
+      <div class="direction-meta">
+        <h2>5. Guided Demo</h2>
+        <p>Best if the POC is presented live and needs explicit narration.</p>
+      </div>
+      <div class="phone"><div class="screen">
+        <div class="hero">
+          <div class="eyebrow">Step 1 of 2</div>
+          <h3 class="title">Create the passkey</h3>
+          <p class="copy">Then log out and prove the return flow.</p>
+        </div>
+        <label>Username</label>
+        <div class="input">renato</div>
+        <div class="actions">
+          <div class="button primary">Start registration</div>
+          <div class="button secondary">I already registered</div>
+        </div>
+        <div class="status">After success, you will land on Home.</div>
+      </div></div>
+    </section>
+
+    <section class="direction direction-6">
+      <div class="direction-meta">
+        <h2>6. Home Proof</h2>
+        <p>Shows the success destination as the emotional proof point.</p>
+      </div>
+      <div class="phone"><div class="screen">
+        <div>
+          <div class="home-badge">✓</div>
+          <h3 class="title">Signed in</h3>
+          <p class="copy">You authenticated with a passkey for username <strong>renato</strong>.</p>
+        </div>
+        <div class="bottom-sheet">
+          <div class="status success">Passkey verified successfully.</div>
+          <div style="height: 12px"></div>
+          <div class="button secondary">Log out and test sign in</div>
+        </div>
+      </div></div>
+    </section>
+
+    <section class="direction direction-7">
+      <div class="direction-meta">
+        <h2>7. Keyboard-Safe Form</h2>
+        <p>Shows how Calm Card reflows when the Android keyboard is visible.</p>
+      </div>
+      <div class="phone"><div class="screen">
+        <div class="eyebrow">Keyboard visible</div>
+        <h3 class="title">Sign in without a password</h3>
+        <p class="copy">The form moves upward. Input, actions, and status stay reachable.</p>
+        <label>Username</label>
+        <div class="input">renato</div>
+        <div class="actions">
+          <div class="button primary">Create passkey</div>
+          <div class="button secondary">Sign in with passkey</div>
+        </div>
+        <div class="keyboard-note">Input, actions, and feedback remain visible while typing.</div>
+        <div class="keyboard" aria-label="Android keyboard mock">
+          <div class="keyboard-row">
+            <div class="key"></div><div class="key"></div><div class="key"></div><div class="key"></div><div class="key"></div>
+            <div class="key"></div><div class="key"></div><div class="key"></div><div class="key"></div><div class="key"></div>
+          </div>
+          <div class="keyboard-row middle">
+            <div></div><div class="key"></div><div class="key"></div><div class="key"></div><div class="key"></div><div class="key"></div>
+            <div class="key"></div><div class="key"></div><div class="key"></div><div class="key"></div><div></div>
+          </div>
+          <div class="keyboard-row bottom">
+            <div class="key"></div><div class="key"></div><div class="key"></div><div class="key"></div><div class="key"></div>
+            <div class="key"></div><div class="key"></div><div class="key"></div><div class="key"></div>
+          </div>
+          <div class="keyboard-row" style="grid-template-columns: 1fr 4fr 1fr;">
+            <div class="key"></div><div class="space-key"></div><div class="key"></div>
+          </div>
+        </div>
+      </div></div>
+    </section>
+  </main>
+</body>
+</html>

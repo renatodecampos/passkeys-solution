@@ -90,7 +90,7 @@ npm run test:watch
 cd passkeys-app
 npx expo run:android   # Build e instala no emulador/device (usa expo-dev-client, não Expo Go)
 npm start              # Expo dev server (sem build nativo)
-npm run lint           # ESLint via expo lint
+npm run lint           # ESLint (script no package.json do app chama o binário em node_modules)
 npm test               # Jest (services/api.ts)
 ```
 
@@ -118,7 +118,9 @@ infra/logger.ts             # Winston logger
 
 File-based routing via Expo Router (similar to Next.js):
 - `_layout.tsx` — root Stack + Theme layout
-- `(tabs)/` — tab navigation group
+- `index.tsx` — entrada pública (Calm Card, registro/login com passkey — RFC-0002)
+- `home.tsx` — tela autenticada (Home Proof: verificação resumida do servidor)
+- `(tabs)/` — grupo de tabs (ex.: explore); fluxo passkey usa `/` e `/home`
 - Path alias `@/*` maps to project root
 
 ## Environment Variables
@@ -153,16 +155,25 @@ cd passkeys-server && npm run test:watch
 cd passkeys-app && npm test
 ```
 
+> **Dependência de setup do app**: o arquivo `jest.config.ts` usa sintaxe TypeScript. Para que o Jest o execute, `ts-node` deve estar instalado como devDependency no `passkeys-app`:
+> ```bash
+> cd passkeys-app && npm install --save-dev ts-node
+> ```
+
 ## Agent Harness
 
 Este projeto usa execução assistida por agentes com rastreamento de estado em arquivos:
 
 - `AGENTS.md` — regras de arquitetura e convenções que todos os agentes devem seguir
-- `tasks/fase-1-status.md` — Infraestrutura e HTTPS no server
-- `tasks/fase-1b-testes-server.md` — Testes unitários do server
-- `tasks/fase-2-status.md` — App Android (prebuild, passkeys, telas)
-- `tasks/fase-3-status.md` — Integração, certificados no emulador, testes E2E
-- `rfcs/completed/RFC-0001-passkeys-poc-completion.md` — especificação completa do plano
+- `tasks/rfc-0001/fase-1-status.md` — Infraestrutura e HTTPS no server
+- `tasks/rfc-0001/fase-1b-testes-server.md` — Testes unitários do server
+- `tasks/rfc-0001/fase-2-status.md` — App Android (prebuild, passkeys, telas)
+- `tasks/rfc-0001/fase-3-status.md` — Integração, certificados no emulador, testes E2E
+- `tasks/rfc-0002/fase-1-ux-app.md` — UX do app (RFC-0002)
+- `tasks/rfc-0002/fase-2-ux-validacao.md` — validação UX/E2E (RFC-0002)
+- `tasks/rfc-0002/fase-3-documentacao.md` — documentação final (RFC-0002)
+- `rfcs/completed/RFC-0001-passkeys-poc-completion.md` — plano base
+- `rfcs/completed/RFC-0002-ux-passkeys-poc.md` — evolução UX (concluída)
 
 Fases são sequenciais. Dentro de cada fase, subtarefas sem dependência podem rodar em paralelo.
 Consulte `tasks/README.md` para a legenda de status.

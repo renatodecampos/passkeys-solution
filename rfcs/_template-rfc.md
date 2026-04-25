@@ -102,7 +102,8 @@ decision_date:
 ### Fase N — Documentação
 
 Última fase de toda RFC. Executada após todas as demais estarem `[x] completed`.
-Arquivo de tasks: `tasks/fase-N-documentacao.md` (use `tasks/_template-fase.md` como base).
+Arquivo de tasks da última fase (documentação): `tasks/rfc-XXXX/fase-N-documentacao.md` (pasta
+por RFC, use `tasks/_template-fase.md` como base).
 
 Escopo fixo:
 - Atualizar `CLAUDE.md` com setup não óbvio e decisões técnicas relevantes

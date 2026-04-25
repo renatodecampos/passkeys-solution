@@ -110,4 +110,12 @@ describe('network error', () => {
 
     await expect(generateRegistrationOptions('alice')).rejects.toThrow('HTTP 401');
   });
+
+  it('appends server error string when body is JSON with error field', async () => {
+    fetchMock.mockResponseOnce(JSON.stringify({ error: 'User not found' }), { status: 404 });
+
+    await expect(generateRegistrationOptions('bob')).rejects.toThrow(
+      'HTTP 404: User not found'
+    );
+  });
 });

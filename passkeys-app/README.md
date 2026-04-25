@@ -1,50 +1,31 @@
-# Welcome to your Expo app 👋
+# passkeys-app
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+Cliente **Expo dev build** da POC de passkeys (WebAuthn). Não use **Expo Go** — o fluxo nativo exige `expo-dev-client`.
 
-## Get started
+## Documentação do repositório
 
-1. Install dependencies
+Setup completo (Docker, HTTPS com mkcert, `adb reverse`, variáveis do servidor, fingerprint Android): [`../CLAUDE.md`](../CLAUDE.md).
 
-   ```bash
-   npm install
-   ```
+## Comandos
 
-2. Start the app
+| Comando | Uso |
+|---------|-----|
+| `npx expo run:android` | Build e instala no emulador/dispositivo |
+| `npm start` | Metro / dev server (após build nativo) |
+| `npm test` | Jest (`services/api.ts` e testes associados) |
+| `npm run lint` | ESLint (script no `package.json` chama o binário em `node_modules`) |
 
-   ```bash
-   npx expo start
-   ```
+## Demo do fluxo UX (RFC-0002)
 
-In the output, you'll find options to open the app in a
+1. Infra: `docker-compose up -d`, server em `passkeys-server` (`npm run dev`), `adb reverse tcp:3000 tcp:3000`.
+2. Abra o app, introduza um username.
+3. **Create passkey** ou **Sign in with passkey** e conclua o prompt do sistema.
+4. A rota `/home` mostra a prova resumida da verificação (`verified`, método `passkey`, etc.). **Logout** volta à entrada (`/`).
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+Rotas principais: `app/index.tsx` (entrada), `app/home.tsx` (autenticado). HTTP apenas em `services/api.ts`.
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+---
 
-## Get a fresh project
+## Expo (referência)
 
-When you're ready, run:
-
-```bash
-npm run reset-project
-```
-
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
-
-## Learn more
-
-To learn more about developing your project with Expo, look at the following resources:
-
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
-
-## Join the community
-
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+Este projeto foi criado com [`create-expo-app`](https://www.npmjs.com/package/create-expo-app). Documentação: [Expo](https://docs.expo.dev/), [Expo Router](https://docs.expo.dev/router/introduction/), [development builds](https://docs.expo.dev/develop/development-builds/introduction/).

@@ -93,8 +93,8 @@
 | `RFC` | [`rfcs/completed/RFC-0001`](../rfcs/completed/RFC-0001-passkeys-poc-completion.md) | Defines the plan |
 | `AGENTS.md` | [`AGENTS.md`](../AGENTS.md) | Defines the rules |
 | `CLAUDE.md` | [`CLAUDE.md`](../CLAUDE.md) | Orients any new agent |
-| `tasks/phase-X.md` | [`tasks/`](../tasks/README.md) | State in real time |
-| `_templates` | [`tasks/_template-phase.md`](../tasks/_template-fase.md) | Ensures replicability |
+| `tasks/rfc-XXXX/fase-....md` | [`tasks/`](../tasks/README.md) | State in real time (one folder per RFC) |
+| `_templates` | [`tasks/_template-fase.md`](../tasks/_template-fase.md) | Ensures replicability |
 
 ---
 
@@ -120,7 +120,7 @@
 
 → [`AGENTS.md`](../AGENTS.md)
 
-- **§0** How to execute a phase → `/feature-dev execute phase X`
+- **§0** How to execute a phase → `/feature-dev execute RFC-XXXX fase Y`
 - **§0** How to scaffold a new RFC → `/feature-dev create harness for RFC-XXXX`
 - **§3** Architecture rules — layers, forbidden imports
 - **§5** Parallelism rules — who runs together, who waits
@@ -172,11 +172,11 @@ Notes           free-form agent observations
 
 | Phase | File | Status |
 |---|---|---|
-| Phase 1 — HTTPS | [`fase-1-status.md`](../tasks/fase-1-status.md) | `[x] completed` |
-| Phase 1b — Tests | [`fase-1b-testes-server.md`](../tasks/fase-1b-testes-server.md) | `[x] completed` |
-| Phase 2 — Android | [`fase-2-status.md`](../tasks/fase-2-status.md) | `[x] completed` |
-| Phase 3 — E2E | [`fase-3-status.md`](../tasks/fase-3-status.md) | `[x] completed` |
-| Phase 4 — Docs | [`fase-4-documentacao.md`](../tasks/fase-4-documentacao.md) | `[x] completed` |
+| Phase 1 — HTTPS | [`fase-1-status.md`](../tasks/rfc-0001/fase-1-status.md) | `[x] completed` |
+| Phase 1b — Tests | [`fase-1b-testes-server.md`](../tasks/rfc-0001/fase-1b-testes-server.md) | `[x] completed` |
+| Phase 2 — Android | [`fase-2-status.md`](../tasks/rfc-0001/fase-2-status.md) | `[x] completed` |
+| Phase 3 — E2E | [`fase-3-status.md`](../tasks/rfc-0001/fase-3-status.md) | `[x] completed` |
+| Phase 4 — Docs | [`fase-4-documentacao.md`](../tasks/rfc-0001/fase-4-documentacao.md) | `[x] completed` |
 
 ---
 
@@ -185,7 +185,7 @@ Notes           free-form agent observations
 ### Templates: the harness replicates itself
 
 ```
-tasks/_template-phase.md  →  new phase with full structure
+tasks/_template-fase.md  →  new phase with full structure (place under `tasks/rfc-xxxx/`)
 rfcs/_template-rfc.md     →  new RFC with all sections
 ```
 
@@ -249,7 +249,7 @@ Each sub-agent marks `[~] in_progress` before, `[x] completed` or `[!] blocked` 
 
 ![Phase 2 execution — BATCH A/B/C with parallel sub-agents](<../imgs/fase 2.png>)
 
-→ [`fase-2-status.md`](../tasks/fase-2-status.md)
+→ [`fase-2-status.md`](../tasks/rfc-0001/fase-2-status.md)
 
 ---
 
@@ -272,7 +272,7 @@ Each sub-agent marks `[~] in_progress` before, `[x] completed` or `[!] blocked` 
 
 ![Phase 3 execution — E2E tests passing, corrections applied during phase](<../imgs/fase 3.png>)
 
-→ [`fase-3-status.md`](../tasks/fase-3-status.md)
+→ [`fase-3-status.md`](../tasks/rfc-0001/fase-3-status.md)
 
 ---
 
