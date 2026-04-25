@@ -116,6 +116,14 @@ Before setting **Phase status** to `[x] completed`, the agent **must** ask the u
 
 Record the reported values in the `## Token usage` table of the phase file. This is required — do not skip it even if the user does not reply immediately.
 
+After filling token usage, display the next step to the user:
+
+- If a next phase exists:
+  > "To continue, open a new context window and run:
+  > `/feature-dev execute RFC-{ID} phase {NEXT}`"
+- If this is the last phase of the RFC:
+  > "All phases of RFC-{ID} are complete."
+
 ### On-disk precondition check
 
 Before declaring a phase blocked on a precondition, **read the previous phase file on disk** and confirm the real status. It may already be `[x] completed` even if the orchestrator did not get explicit confirmation (lesson: RFC-0002 phase 3).

@@ -104,6 +104,11 @@ The phase is complete only when this command produces the expected output.
   Then fill **## Token usage** with the reported values.
 - Set **Phase status** to `[x] completed` with **Completed at**
 - Any block → set **Phase status** to `[!] blocked` and record under Blockers
+- If the phase completed successfully and a next phase exists, display to the user:
+  > "To continue, open a new context window and run:
+  > `/feature-dev execute RFC-{{RFC_ID}} phase {{PROXIMO_NUMERO}}`"
+  If this is the last phase of the RFC, display instead:
+  > "All phases of RFC-{{RFC_ID}} are complete."
 
 ---
 
