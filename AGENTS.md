@@ -114,7 +114,9 @@ Before setting **Phase status** to `[x] completed`, the agent **must** ask the u
 
 > "Phase complete. How many tokens were consumed and what % of the context window was used?"
 
-Record the reported values in the `## Token usage` table of the phase file. This is required — do not skip it even if the user does not reply immediately.
+Record the reported values in the `## Token usage` table of the phase file and update the **Token summary** table in `tasks/feedback-forward.md` (add the row, recalculate the total). This is required — do not skip it even if the user does not reply immediately.
+
+**Context window limit:** plan to finish or hand off the phase before **75%** of the context window is consumed. Above that, the risk of silent errors (dropped instructions, wrong file edited) increases meaningfully.
 
 After filling token usage, display the next step to the user:
 

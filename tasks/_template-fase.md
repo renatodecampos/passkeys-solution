@@ -101,7 +101,10 @@ The phase is complete only when this command produces the expected output.
 ### Wrap-up
 - All done and completion criterion verified → ask the user:
   > "Phase complete. How many tokens were consumed and what % of the context window was used?"
-  Then fill **## Token usage** with the reported values.
+  Then:
+  1. Fill **## Token usage** in this file with the reported values
+  2. Add or update the corresponding row in the **Token summary** table in `tasks/feedback-forward.md`
+  3. Recalculate the **Total tokens tracked** line in that table
 - Set **Phase status** to `[x] completed` with **Completed at**
 - Any block → set **Phase status** to `[!] blocked` and record under Blockers
 - If the phase completed successfully and a next phase exists, display to the user:

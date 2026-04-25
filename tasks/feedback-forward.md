@@ -7,6 +7,29 @@
 
 ---
 
+## Token summary
+
+> Updated by the agent at the end of each phase.
+> **Recommended limit: ≤ 75% context window.** Above that, risk of silent errors increases
+> (instructions dropped, wrong file edited). Plan a new context window before reaching 75%.
+
+| RFC | Phase | Tool | Tokens | Context % |
+|-----|-------|------|--------|-----------|
+| RFC-0001 | 1 | — | — | — |
+| RFC-0001 | 1b | — | — | — |
+| RFC-0001 | 2 | — | — | — |
+| RFC-0001 | 3 | — | — | — |
+| RFC-0001 | 4 | — | — | — |
+| RFC-0002 | 1 | — | — | — |
+| RFC-0002 | 2 | Cursor | ~109k | 54.3% |
+| RFC-0002 | 3 | — | — | — |
+| RFC-0003 | 1 | — | — | — |
+| RFC-0003 | 2 | — | — | — |
+
+**Total tokens tracked:** ~109k _(incomplete — fill as phases report)_
+
+---
+
 ## RFC-0001 — Passkeys PoC wrap-up — local HTTPS + Android
 
 ### Phase 1 — Infrastructure and HTTPS
@@ -169,6 +192,43 @@
 | None critical | Orchestrator should confirm phase 2 on disk is `[x]` before treating phase 3 as blocked |
 
 **Applied?** `[x]` Yes — AGENTS.md §2: on-disk check before declaring blocked
+
+---
+
+## RFC-0003 — Visual Identity — app icon, splash, Light Clean theme
+
+### Phase 1 — Asset generation and replacement
+
+**What went well**
+- One canvas script (`passkeys-app/scripts/generate-rfc-0003-assets.cjs`) reproduces the RFC’s ring geometry and all four target sizes, including 22% rounded clip for `icon.png`
+
+**What caused friction / rework**
+- No `tasks/rfc-0003/` on disk; phase file and README section were created during this execution. RFC text still references `phase-1-assets.md` while the repo uses `fase-1-assets.md`
+
+**Suggested harness updates**
+| File | Change |
+|------|--------|
+| `AGENTS.md` | Add RFC-0003 execute rows in Documentation phase (forbidden to edit `AGENTS.md` during phase execution) |
+| `rfcs/proposed/RFC-0003-*.md` | Point Implementation Plan task paths to `fase-*` filenames |
+
+**Applied?** `[ ]` Not yet — pending Documentation phase of RFC-0003
+
+### Phase 2 — `app.json` configuration
+
+**What went well**
+- Three color touchpoints are easy to verify with a one-liner `node -e` against `app.json`
+- No TypeScript or native changes; RFC non-goal preserved
+
+**What caused friction / rework**
+- Task file `fase-2-appjson.md` was missing; RFC still says `phase-2-appjson.md`
+- Values were already correct in the tree; execution was verify-and-document, not edit
+
+**Suggested harness updates**
+| File | Change |
+|------|--------|
+| `rfcs/proposed/RFC-0003-*.md` | Same as phase 1: align Implementation Plan filenames to `fase-2-appjson.md` |
+
+**Applied?** `[ ]` Not yet — pending Documentation phase of RFC-0003
 
 ---
 
