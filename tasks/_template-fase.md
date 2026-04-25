@@ -108,7 +108,13 @@ The phase is complete only when this command produces the expected output.
   > "To continue, open a new context window and run:
   > `/feature-dev execute RFC-{{RFC_ID}} phase {{PROXIMO_NUMERO}}`"
   If this is the last phase of the RFC, display instead:
-  > "All phases of RFC-{{RFC_ID}} are complete."
+  > "All phases of RFC-{{RFC_ID}} are complete.
+  >
+  > Before closing this context, review the insights accumulated during this RFC:
+  > `tasks/feedback-forward.md`
+  >
+  > Look for entries marked `Applied? [ ]` — these are pending harness improvements
+  > that can be applied now or tracked for the next RFC."
 
 ---
 

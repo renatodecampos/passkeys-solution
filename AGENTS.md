@@ -122,7 +122,13 @@ After filling token usage, display the next step to the user:
   > "To continue, open a new context window and run:
   > `/feature-dev execute RFC-{ID} phase {NEXT}`"
 - If this is the last phase of the RFC:
-  > "All phases of RFC-{ID} are complete."
+  > "All phases of RFC-{ID} are complete.
+  >
+  > Before closing this context, review the insights accumulated during this RFC:
+  > `tasks/feedback-forward.md`
+  >
+  > Look for entries marked `Applied? [ ]` — these are pending harness improvements
+  > that can be applied now or tracked for the next RFC."
 
 ### On-disk precondition check
 
