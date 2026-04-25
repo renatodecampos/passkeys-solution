@@ -1,186 +1,185 @@
-# Feedback Forward — Acumulador Cross-RFC
+# Feedback Forward — cross-RFC log
 
-> Cada fase concluída acrescenta uma entrada aqui. Este arquivo é lido na fase de
-> Documentação de cada RFC e alimenta atualizações em `AGENTS.md`, `CLAUDE.md` e
-> `_template-fase.md`.
+> Each completed phase adds an entry here. This file is read in each RFC’s Documentation phase
+> and drives updates to `AGENTS.md`, `CLAUDE.md`, and `_template-fase.md`.
 >
-> Agente: preencha a seção da sua fase antes de marcar `[x] completed`.
+> Agent: fill your phase section before marking `[x] completed`.
 
 ---
 
-## RFC-0001 — Conclusão da POC de Passkeys — HTTPS Local + Android
+## RFC-0001 — Passkeys PoC wrap-up — local HTTPS + Android
 
-### Fase 1 — Infraestrutura e HTTPS
+### Phase 1 — Infrastructure and HTTPS
 
-**O que funcionou bem**
-- Parallelism map explícito (1.1, 1.2, 1.5 em paralelo) funcionou sem conflitos
-- Critério de conclusão com comando real (`curl -k`) foi objetivo e verificável
+**What went well**
+- Explicit parallelism map (1.1, 1.2, 1.5 in parallel) worked without conflicts
+- Completion criterion with a real command (`curl -k`) was objective and verifiable
 
-**O que atrapalhou / gerou retrabalho**
-- Variáveis de ambiente no `.env-example` estavam desatualizadas (`REDIS_HOST`/`REDIS_PORT` → `REDIS_URL`; `MONGODB_DATABASE` → `DB_NAME` + `COLLECTION_NAME`). O agente teve que reconciliar na execução
-- `RP_ORIGIN` no `.env-example` apontava para `http://localhost:3001` (sem HTTPS, porta errada). Spec da fase devia incluir validação de consistência com `setup/index.ts`
-- `mkcert -install` requer sudo interativo — não é automatizável; devia estar marcado como `[ação manual]` na subtarefa
+**What caused friction / rework**
+- Environment variables in `.env-example` were outdated (`REDIS_HOST`/`REDIS_PORT` → `REDIS_URL`; `MONGODB_DATABASE` → `DB_NAME` + `COLLECTION_NAME`). The agent had to reconcile at runtime
+- `RP_ORIGIN` in `.env-example` pointed to `http://localhost:3001` (no HTTPS, wrong port). Phase spec should have required consistency with `setup/index.ts`
+- `mkcert -install` needs interactive sudo — not automatable; should have been tagged **[manual action]** on the subtask
 
-**Atualizações aplicadas ao harness**
-| Arquivo | Mudança |
-|---------|---------|
-| `CLAUDE.md` | `.env-example` atualizado para refletir nomes reais das variáveis |
-| `CLAUDE.md` | Nota sobre `mkcert -install` como ação manual com senha |
+**Updates applied to the harness**
+| File | Change |
+|------|--------|
+| `CLAUDE.md` | `.env-example` updated to real variable names |
+| `CLAUDE.md` | Note on `mkcert -install` as manual step with password |
 
-**Aplicado?** `[x]` Sim — fase 4 de documentação
-
----
-
-### Fase 1b — Testes Unitários do Server
-
-**O que funcionou bem**
-- Paralelismo real entre 1b.2 e 1b.3 (registration e authentication) sem conflitos
-- Convenção de mocks inline (sem `__mocks__` global) foi clara e reproduzível
-- Cobertura final: 100% statements/funções, 84% branches — acima do threshold
-
-**O que atrapalhou / gerou retrabalho**
-- Flag do Jest v29 renomeada: a subtarefa usava `--testPathPattern` (singular); a versão instalada exige `--testPathPatterns` (plural). Custo: retrabalho no critério de verificação
-- `console.error` no catch de `registration/index.ts` produz output de teste que parece erro mas é comportamento esperado — causa confusão ao ler o relatório de teste
-
-**Atualizações sugeridas para o harness**
-| Arquivo | Seção | Mudança sugerida |
-|---------|-------|-----------------|
-| `AGENTS.md` | Seção 6 (Testes) | Documentar que Jest v29+ usa `--testPathPatterns` (plural) |
-| `_template-fase.md` | Notas de template | Lembrete: verificar flags da versão instalada antes de fixar comandos na spec |
-
-**Aplicado?** `[x]` Sim — feedback-forward RFC-0002 (AGENTS.md seção 6; CLAUDE.md seção Testes)
+**Applied?** `[x]` Yes — phase 4 documentation
 
 ---
 
-### Fase 2 — App Android
+### Phase 1b — Server unit tests
 
-**O que funcionou bem**
-- Separar a cadeia nativa (2.1→2.2→2.3→2.4) do serviço (2.5→2.8) em dois sub-agentes paralelos funcionou bem
-- `react-native-passkey` v3.3.3 compatível com Expo SDK 53 / RN 0.79 sem ajustes
+**What went well**
+- Real parallelism between 1b.2 and 1b.3 (registration and authentication) without conflicts
+- Inline mock convention (no global `__mocks__`) was clear and reproducible
+- Final coverage: 100% statements/functions, 84% branches — above threshold
 
-**O que atrapalhou / gerou retrabalho**
-- `ts-node` não estava listado como dependência de setup; foi descoberto ao executar `jest.config.ts` em TypeScript. Deveria estar na spec de 2.8
-- Verificação final de `npx expo run:android` ficou marcada como "pendente" — requer emulador físico/emulado que o agente não pode operar autonomamente. Subtarefas com dependência de hardware devem ser marcadas como `[ação manual]`
-- Blocker de Gradle (7.3.3 incompatível com Expo SDK 53) só apareceu na fase 3; a spec de 2.2 (`expo prebuild`) devia incluir verificação de `sdkVersion` no `app.json`
-- Arquitetura de rotas (`app/index.tsx` vs `app/(tabs)/index.tsx`) não estava suficientemente especificada — gerou blocker de navegação resolvido na fase 3
+**What caused friction / rework**
+- Jest v29 renamed the flag: the subtask used `--testPathPattern` (singular); the installed version requires `--testPathPatterns` (plural). Extra work on the verification criterion
+- `console.error` in the catch of `registration/index.ts` looks like an error in test output but is expected — confusing when reading the test report
 
-**Atualizações sugeridas para o harness**
-| Arquivo | Seção | Mudança sugerida |
-|---------|-------|-----------------|
-| `AGENTS.md` | Seção 4 (App) | Adicionar: verificar `sdkVersion` em `app.json` antes de `expo prebuild` |
-| `CLAUDE.md` | Setup do app | Documentar que `ts-node` é devDependency necessária para `jest.config.ts` em TypeScript |
-| `_template-fase.md` | Template | Marcar subtarefas com dependência de hardware como `[ação manual]` |
+**Suggested harness updates**
+| File | Section | Suggested change |
+|------|---------|------------------|
+| `AGENTS.md` | Section 6 (Tests) | Document Jest v29+ uses `--testPathPatterns` (plural) |
+| `_template-fase.md` | Template notes | Reminder: check installed version flags before fixing commands in the spec |
 
-**Aplicado?** `[x]` Sim — feedback-forward RFC-0002 (AGENTS.md seção 4: sdkVersion + rota home.tsx; CLAUDE.md: ts-node; _template-fase.md: marcação [ação manual])
+**Applied?** `[x]` Yes — feedback-forward RFC-0002 (AGENTS.md §6; CLAUDE.md Tests)
 
 ---
 
-### Fase 3 — Integração e E2E
+### Phase 2 — Android app
 
-**O que funcionou bem**
-- Parallelism map (3.1, 3.2, 3.3 simultâneos) reduziu latência da fase
-- Seção "Troubleshooting comum" nas Notas foi adicionada organicamente — boa prática a institucionalizar
+**What went well**
+- Splitting the native chain (2.1→2.2→2.3→2.4) from the service chain (2.5→2.8) into two parallel sub-agents worked well
+- `react-native-passkey` v3.3.3 works with Expo SDK 53 / RN 0.79 without tweaks
 
-**O que atrapalhou / gerou retrabalho** ⚠️ (4 blockers nesta fase — sinal de gaps nas fases anteriores)
-- Caminho do debug keystore na spec estava errado: spec dizia `~/.android/debug.keystore`; real é `passkeys-app/android/app/debug.keystore`
-- `ANDROID_ORIGIN` (`android:apk-key-hash:...`) não estava no harness inicial; só foi descoberto ao executar o fluxo real. Deveria estar na spec da Fase 1 ou na lista de variáveis de `.env-example`
-- Body vazio em `generate-authentication-options` — bug em `services/api.ts` que os testes unitários da fase 1b não cobriram (teste mockava o fetch, não validava o body enviado)
-- Navegação de logout presa — arquitetura de rotas insuficientemente especificada na fase 2; corrigida movendo home para `app/home.tsx`
+**What caused friction / rework**
+- `ts-node` was not listed as a setup dependency; found when running `jest.config.ts` in TypeScript. Should have been in the 2.8 spec
+- Final check for `npx expo run:android` stayed "pending" — needs a physical/emulated device the agent cannot drive alone. Hardware-dependent subtasks should be **[manual action]**
+- Gradle blocker (7.3.3 incompatible with Expo SDK 53) only surfaced in phase 3; the 2.2 spec (`expo prebuild`) should have required checking `sdkVersion` in `app.json`
+- Route architecture (`app/index.tsx` vs `app/(tabs)/index.tsx`) was underspecified — navigation blocker fixed in phase 3
 
-**Atualizações sugeridas para o harness**
-| Arquivo | Seção | Mudança sugerida |
-|---------|-------|-----------------|
-| `CLAUDE.md` | Env vars | Documentar `ANDROID_ORIGIN` e como calcular o `apk-key-hash` |
-| `CLAUDE.md` | Setup | Corrigir caminho do debug keystore para `passkeys-app/android/app/debug.keystore` |
-| `AGENTS.md` | Seção 4 (App) | Adicionar regra: rota de home autenticado usa `app/home.tsx`, não `app/(tabs)/index.tsx` |
-| `AGENTS.md` | Seção 6 (Testes) | Testes de `services/api.ts` devem validar body enviado no fetch, não apenas a resposta |
+**Suggested harness updates**
+| File | Section | Suggested change |
+|------|---------|------------------|
+| `AGENTS.md` | Section 4 (App) | Add: verify `sdkVersion` in `app.json` before `expo prebuild` |
+| `CLAUDE.md` | App setup | Document `ts-node` as a devDependency for TypeScript `jest.config.ts` |
+| `_template-fase.md` | Template | Mark hardware-dependent subtasks as **[manual action]** |
 
-**Aplicado?** `[x]` Sim — feedback-forward RFC-0002 (AGENTS.md seção 4: rota home.tsx; seção 6: body validation)
-
----
-
-### Fase 4 — Documentação
-
-**O que funcionou bem**
-- Estratégia "documente apenas o que não é óbvio" manteve o `CLAUDE.md` conciso
-- Leitura das `## Notas` das fases anteriores foi suficiente para gerar o `CLAUDE.md`
-
-**O que atrapalhou / gerou retrabalho**
-- Vários insights das Notas das fases já estavam "esquecidos" no momento da documentação por ausência de um acumulador persistente — criação deste arquivo (`feedback-forward.md`) resolve isso
-
-**Atualizações sugeridas para o harness**
-| Arquivo | Seção | Mudança sugerida |
-|---------|-------|-----------------|
-| `_template-fase.md` | Nova seção | Adicionar `## Feedback Forward` como campo obrigatório antes de `[x] completed` |
-| `AGENTS.md` | Nova seção | Regra: preencher `## Feedback Forward` e atualizar `tasks/feedback-forward.md` ao concluir fase |
-| `tasks/README.md` | Referência | Mencionar `feedback-forward.md` como acumulador cross-RFC |
-
-**Aplicado?** `[x]` Sim — este arquivo
+**Applied?** `[x]` Yes — feedback-forward RFC-0002 (AGENTS.md §4: sdkVersion + `home.tsx` route; CLAUDE.md: ts-node; `_template-fase.md`: [manual action] tag)
 
 ---
 
-## RFC-0002 — UX da POC de Passkeys Android
+### Phase 3 — Integration and E2E
 
-### Fase 1 — UX do App Android
+**What went well**
+- Parallelism map (3.1, 3.2, 3.3 at once) reduced phase latency
+- A "common troubleshooting" section in Notes grew organically — worth standardizing
 
-**O que funcionou bem**
-- Spec da fase referenciou diretamente as correções da RFC-0001 (home em `app/home.tsx`)
-- Separação entre visual (1.1), keyboard (1.2), feedback (1.3) e home (1.4) foi clara
+**What caused friction / rework** ⚠️ (4 blockers in this phase — sign of gaps in earlier phases)
+- Debug keystore path in the spec was wrong: spec said `~/.android/debug.keystore`; actual is `passkeys-app/android/app/debug.keystore`
+- `ANDROID_ORIGIN` (`android:apk-key-hash:...`) was not in the initial harness; only found when running the real flow. Should be in phase 1 spec or `.env-example`
+- Empty body in `generate-authentication-options` — bug in `services/api.ts` that phase 1b unit tests did not cover (test mocked fetch, did not assert request body)
+- Logout navigation stuck — route architecture underspecified in phase 2; fixed by moving home to `app/home.tsx`
 
-**O que atrapalhou / gerou retrabalho**
-- `npm run lint` falhava por resolução do binário `eslint`; o script em `passkeys-app/package.json` foi ajustado para invocar `node ./node_modules/eslint/bin/eslint.js` (registado nas Notas da fase 1)
+**Suggested harness updates**
+| File | Section | Suggested change |
+|------|---------|------------------|
+| `CLAUDE.md` | Env vars | Document `ANDROID_ORIGIN` and how to compute `apk-key-hash` |
+| `CLAUDE.md` | Setup | Fix debug keystore path to `passkeys-app/android/app/debug.keystore` |
+| `AGENTS.md` | Section 4 (App) | Rule: authenticated home uses `app/home.tsx`, not `app/(tabs)/index.tsx` |
+| `AGENTS.md` | Section 6 (Tests) | `services/api.ts` tests must assert fetch body, not only response |
 
-**Atualizações sugeridas para o harness**
-| Arquivo | Mudança |
-|---------|---------|
-| `CLAUDE.md` / `passkeys-app/README.md` | Mencionar o script de lint do app (feito na fase 3) |
-
-**Aplicado?** `[x]` Sim — fase 3 de documentação
-
----
-
-### Fase 2 — Validação UX e E2E
-
-**O que funcionou bem**
-- Critério de automação (`npm test && npm run lint`) objetivo; teste HTTP 404 alinhado a `api.ts`
-- Notas separaram evidência de código (keyboard, `accessibilityLabelledBy`, mapas de erro) de checklist manual
-
-**O que atrapalhou / gerou retrabalho**
-- Subtarefas 2.2–2.3 dependem de emulador; o harness já prevê validação manual — sem alteração de template necessária
-
-**Atualizações sugeridas para o harness**
-- Nenhuma de alta prioridade a partir desta fase
-
-**Aplicado?** `[x]` N/A
+**Applied?** `[x]` Yes — feedback-forward RFC-0002 (AGENTS.md §4: `home.tsx` route; §6: body validation)
 
 ---
 
-### Fase 3 — Documentação
+### Phase 4 — Documentation
 
-**O que funcionou bem**
-- RFC-0002 em `rfcs/completed/` com Decision Record; `token-report.md` consolida métricas das três fases
-- `CLAUDE.md` agora descreve `index.tsx` / `home.tsx` e liga tarefas RFC-0002; README do app orienta demo sem duplicar a RFC
+**What went well**
+- "Document only what is not obvious" kept `CLAUDE.md` short
+- Reading `## Notes` from earlier phases was enough to produce `CLAUDE.md`
 
-**O que atrapalhou / gerou retrabalho**
-- Ficheiro de fase 3 ainda listava fase 2 como bloqueada; reconciliação manual do estado real dos ficheiros de task antes de executar
+**What caused friction / rework**
+- Several insights from phase Notes were "lost" at doc time for lack of a persistent log — this file (`feedback-forward.md`) fixes that
 
-**Atualizações sugeridas para o harness**
-| Arquivo | Mudança |
-|---------|---------|
-| Nenhuma crítica | Orquestrador deve confirmar `fase-2` no disco como `[x]` antes de tratar fase 3 como bloqueada |
+**Suggested harness updates**
+| File | Section | Suggested change |
+|------|---------|------------------|
+| `_template-fase.md` | New section | Add `## Feedback Forward` as required before `[x] completed` |
+| `AGENTS.md` | New section | Rule: fill `## Feedback Forward` and update `tasks/feedback-forward.md` when a phase ends |
+| `tasks/README.md` | Reference | Mention `feedback-forward.md` as cross-RFC log |
 
-**Aplicado?** `[x]` Sim — AGENTS.md seção 2: regra de verificação no disco antes de declarar bloqueio
+**Applied?** `[x]` Yes — this file
 
 ---
 
-## Insights transversais (aplicam a todas as RFCs)
+## RFC-0002 — Android passkeys PoC UX
 
-| Categoria | Insight | Prioridade |
-|-----------|---------|-----------|
-| **Spec** | Sempre cruzar nomes de env vars com `setup/index.ts` antes de escrever a fase | Alta |
-| **Spec** | Verificar caminhos de arquivos gerados por tooling (keystores, certs) executando antes de fixar na spec | Alta |
-| **Testes** | Testes de serviços HTTP devem validar o body/headers enviados, não apenas a resposta mockada | Média |
-| **Infra** | Subtarefas com dependência de hardware ou interação manual → marcar `[ação manual]` + não bloquear o parallelism map | Média |
-| **Tooling** | Fixar versões de flags de CLI na spec (ex: `--testPathPatterns` no Jest v29) | Baixa |
-| **Arquitetura** | Definir estrutura de rotas do app (qual arquivo é home autenticado) na RFC, não na fase | Alta |
-| **Blockers** | Fase com 3+ blockers resolvidos = spec da fase anterior tinha gaps; revisar template para exigir validação de pré-condições mais explícita | Alta |
+### Phase 1 — Android app UX
+
+**What went well**
+- Phase spec referenced RFC-0001 fixes directly (home on `app/home.tsx`)
+- Split between visual (1.1), keyboard (1.2), feedback (1.3), and home (1.4) was clear
+
+**What caused friction / rework**
+- `npm run lint` failed resolving the `eslint` binary; `passkeys-app/package.json` was updated to `node ./node_modules/eslint/bin/eslint.js` (recorded in phase 1 Notes)
+
+**Suggested harness updates**
+| File | Change |
+|------|--------|
+| `CLAUDE.md` / `passkeys-app/README.md` | Mention the app lint script (done in phase 3) |
+
+**Applied?** `[x]` Yes — phase 3 documentation
+
+---
+
+### Phase 2 — UX validation and E2E
+
+**What went well**
+- Automation criterion (`npm test && npm run lint`) was objective; HTTP 404 test aligned with `api.ts`
+- Notes split code evidence (keyboard, `accessibilityLabelledBy`, error maps) from manual checklist
+
+**What caused friction / rework**
+- Subtasks 2.2–2.3 need an emulator; the harness already allows manual validation — no template change required
+
+**Suggested harness updates**
+- None high-priority from this phase
+
+**Applied?** `[x]` N/A
+
+---
+
+### Phase 3 — Documentation
+
+**What went well**
+- RFC-0002 in `rfcs/completed/` with Decision Record; `token-report.md` consolidates metrics across all three phases
+- `CLAUDE.md` now describes `index.tsx` / `home.tsx` and links RFC-0002 tasks; app README orients the demo without duplicating the RFC
+
+**What caused friction / rework**
+- Phase 3 file still listed phase 2 as blocked; manual reconciliation of on-disk task state before running
+
+**Suggested harness updates**
+| File | Change |
+|------|--------|
+| None critical | Orchestrator should confirm phase 2 on disk is `[x]` before treating phase 3 as blocked |
+
+**Applied?** `[x]` Yes — AGENTS.md §2: on-disk check before declaring blocked
+
+---
+
+## Cross-cutting insights (all RFCs)
+
+| Category | Insight | Priority |
+|----------|---------|----------|
+| **Spec** | Always cross-check env var names with `setup/index.ts` before writing the phase | High |
+| **Spec** | Verify paths for tooling outputs (keystores, certs) by running them before fixing in the spec | High |
+| **Tests** | HTTP service tests should assert request body/headers, not only mocked responses | Medium |
+| **Infra** | Subtasks needing hardware or manual interaction → tag **[manual action]** + do not block the parallelism map | Medium |
+| **Tooling** | Pin CLI flag versions in the spec (e.g. `--testPathPatterns` in Jest v29) | Low |
+| **Architecture** | Define app route structure (which file is authenticated home) in the RFC, not only in a phase | High |
+| **Blockers** | Phase with 3+ resolved blockers = prior phase spec had gaps; review template to require stricter preconditions | High |

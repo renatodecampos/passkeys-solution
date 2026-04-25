@@ -1,19 +1,19 @@
-# Fase 2 — App Android
+# Phase 2 — Android app
 
-**Status da fase**: `[x] completed`
-**Agente responsável**: Cursor Agent (Sonnet 4.6)
-**Iniciado em**: 2026-04-24T14:00:00Z
-**Concluído em**: 2026-04-24T14:30:00Z
+**Phase status**: `[x] completed`
+**Owning agent**: Cursor Agent (Sonnet 4.6)
+**Started at**: 2026-04-24T14:00:00Z
+**Completed at**: 2026-04-24T14:30:00Z
 
 ---
 
-## Pré-requisito
+## Prerequisite
 
 Fase 1 deve estar `[x] completed` antes de iniciar esta fase.
 
 ---
 
-## Critério de conclusão
+## Completion criterion
 
 O app compila e abre no emulador Android (API 34+) sem erros, mostrando a tela de login/registro com os dois botões funcionando (mesmo que o fluxo completo ainda falhe por cert — isso é testado na Fase 3).
 
@@ -25,28 +25,28 @@ npx expo run:android
 
 ---
 
-## Subtarefas
+## Subtasks
 
 ### 2.1 — Instalar react-native-passkey
 - **Status**: `[x] completed`
 - **depends_on**: []
-- **Arquivo**: `passkeys-app/package.json`
-- **O que fazer**: `cd passkeys-app && npx expo install react-native-passkey`
-- **Verificação**: `react-native-passkey` aparece em `dependencies` no `package.json`
+- **File**: `passkeys-app/package.json`
+- **What to do**: `cd passkeys-app && npx expo install react-native-passkey`
+- **Verification**: `react-native-passkey` aparece em `dependencies` no `package.json`
 - **Atenção**: Confirmar compatibilidade com Expo SDK 53 / RN 0.79. Se incompatível, registrar em Blockers e avaliar `@react-native-passkeys/passkeys` como alternativa.
 
 ### 2.2 — expo prebuild
 - **Status**: `[x] completed`
 - **depends_on**: [2.1]
-- **O que fazer**: `cd passkeys-app && npx expo prebuild --platform android --clean`
-- **Verificação**: Diretório `passkeys-app/android/` criado com `app/src/main/AndroidManifest.xml`
+- **What to do**: `cd passkeys-app && npx expo prebuild --platform android --clean`
+- **Verification**: Diretório `passkeys-app/android/` criado com `app/src/main/AndroidManifest.xml`
 - **Nota**: Isso gera código nativo Android. O diretório `android/` deve ser adicionado ao controle de versão (não ao .gitignore) para que os agentes de fase 3 possam modificá-lo.
 
 ### 2.3 — network_security_config.xml
 - **Status**: `[x] completed`
 - **depends_on**: [2.2]
-- **Arquivo**: `passkeys-app/android/app/src/main/res/xml/network_security_config.xml`
-- **O que fazer**: Criar o arquivo conforme spec da RFC:
+- **File**: `passkeys-app/android/app/src/main/res/xml/network_security_config.xml`
+- **What to do**: Criar o arquivo conforme spec da RFC:
   ```xml
   <?xml version="1.0" encoding="utf-8"?>
   <network-security-config>
@@ -58,53 +58,53 @@ npx expo run:android
     </debug-overrides>
   </network-security-config>
   ```
-- **Verificação**: Arquivo existe no caminho correto
+- **Verification**: Arquivo existe no caminho correto
 
 ### 2.4 — AndroidManifest.xml
 - **Status**: `[x] completed`
 - **depends_on**: [2.3]
-- **Arquivo**: `passkeys-app/android/app/src/main/AndroidManifest.xml`
-- **O que fazer**: Adicionar atributo `android:networkSecurityConfig="@xml/network_security_config"` na tag `<application>`
-- **Verificação**: Atributo presente no manifest
+- **File**: `passkeys-app/android/app/src/main/AndroidManifest.xml`
+- **What to do**: Adicionar atributo `android:networkSecurityConfig="@xml/network_security_config"` na tag `<application>`
+- **Verification**: Atributo presente no manifest
 
 ### 2.5 — services/api.ts
 - **Status**: `[x] completed`
 - **depends_on**: []
-- **Arquivo**: `passkeys-app/services/api.ts` (criar diretório `services/` se não existir)
-- **O que fazer**: Implementar as 4 funções conforme spec da RFC:
+- **File**: `passkeys-app/services/api.ts` (criar diretório `services/` se não existir)
+- **What to do**: Implementar as 4 funções conforme spec da RFC:
   - `generateRegistrationOptions(username)`
   - `verifyRegistration(username, response)`
   - `generateAuthenticationOptions(username)`
   - `verifyAuthentication(username, response)`
   - `BASE_URL = 'https://localhost:3000'`
-- **Verificação**: TypeScript compila sem erros (`tsc --noEmit` no app)
+- **Verification**: TypeScript compila sem erros (`tsc --noEmit` no app)
 
 ### 2.6 — Tela de login/registro (app/index.tsx)
 - **Status**: `[x] completed`
 - **depends_on**: [2.1, 2.5]
-- **Arquivo**: `passkeys-app/app/index.tsx`
-- **O que fazer**: Substituir o conteúdo atual por:
+- **File**: `passkeys-app/app/index.tsx`
+- **What to do**: Substituir o conteúdo atual por:
   - Input de texto para `username`
   - Botão "Registrar" que chama `generateRegistrationOptions` → `Passkey.create` → `verifyRegistration`
   - Botão "Entrar" que chama `generateAuthenticationOptions` → `Passkey.get` → `verifyAuthentication`
   - Feedback de estado: loading, erro, sucesso
   - Após sucesso: navegar para `/(tabs)`
-- **Verificação**: Tela renderiza no emulador com os dois botões visíveis
+- **Verification**: Tela renderiza no emulador com os dois botões visíveis
 
 ### 2.7 — Tela home autenticado (app/(tabs)/index.tsx)
 - **Status**: `[x] completed`
 - **depends_on**: [2.6]
-- **Arquivo**: `passkeys-app/app/(tabs)/index.tsx`
-- **O que fazer**: Substituir conteúdo de exemplo por:
+- **File**: `passkeys-app/app/(tabs)/index.tsx`
+- **What to do**: Substituir conteúdo de exemplo por:
   - Exibir username logado (passar via router params ou estado global simples)
   - Botão de logout que volta para `app/index.tsx`
-- **Verificação**: Tela renderiza no emulador
+- **Verification**: Tela renderiza no emulador
 
 ### 2.8 — Testes unitários de services/api.ts
 - **Status**: `[x] completed`
 - **depends_on**: [2.5]
-- **Arquivo**: `passkeys-app/services/__tests__/api.test.ts`
-- **O que fazer**:
+- **File**: `passkeys-app/services/__tests__/api.test.ts`
+- **What to do**:
   1. Instalar dependências de teste (se não presentes):
      ```bash
      cd passkeys-app
@@ -140,7 +140,7 @@ npx expo run:android
   - `verifyAuthentication`: envia POST com header `x-username` para `/verify-authentication` → retorna JSON da resposta
   - Erro de rede: fetch rejeita → erro propagado para o chamador
 
-- **Verificação**: `npm test` no app — todos os casos passam
+- **Verification**: `npm test` no app — todos os casos passam
 
 ---
 
@@ -154,41 +154,41 @@ npx expo run:android
 2.7 ← depends_on [2.6]
 ```
 
-Subtarefas 2.1 (e sua cadeia), 2.5 e 2.8 podem ser iniciadas sem bloquear umas às outras.
+Subtasks 2.1 (and its chain), 2.5, and 2.8 can start without blocking each other.
 
 ---
 
-## Instruções para o Orquestrador
+## Orchestrator instructions
 
-> Estas instruções são lidas automaticamente quando você executa `/feature-dev execute RFC-0001 fase 2`
+> These instructions apply when you run `/feature-dev execute RFC-0001 phase 2`
 
-**Pré-condição**: verifique que `tasks/rfc-0001/fase-1b-testes-server.md` está `[x] completed`. Se não estiver, pare e informe.
+**Precondition:** confirm `tasks/rfc-0001/fase-1b-testes-server.md` is `[x] completed`. If not, stop and report.
 
-**Ao iniciar**: atualize o cabeçalho deste arquivo — `Status da fase` para `[~] in_progress`, `Agente responsável` com seu nome, `Iniciado em` com timestamp ISO.
+**On start:** update this file’s header — set **Phase status** to `[~] in_progress`, **Owning agent** to your name, **Started at** to an ISO timestamp.
 
 ### BATCH A — paralelo
 Dispare dois sub-agentes **simultaneamente**:
 
-**Sub-agente 1 — cadeia nativa**
+**Sub-agent 1 — cadeia nativa**
 - Execute 2.1: `cd passkeys-app && npx expo install react-native-passkey`
   - Se incompatível com Expo SDK 53 / RN 0.79: registre em Blockers e avalie `@react-native-passkeys/passkeys`
-  - Marque 2.1 `[x] completed` ou `[!] blocked`
+  - Mark 2.1 `[x] completed` ou `[!] blocked`
 - Execute 2.2 (depende de 2.1): `npx expo prebuild --platform android --clean`
-  - Marque 2.2 `[x] completed`
+  - Mark 2.2 `[x] completed`
 - Execute 2.3 (depende de 2.2): crie `passkeys-app/android/app/src/main/res/xml/network_security_config.xml`
-  - Marque 2.3 `[x] completed`
+  - Mark 2.3 `[x] completed`
 - Execute 2.4 (depende de 2.3): adicione `android:networkSecurityConfig` no `AndroidManifest.xml`
-  - Marque 2.4 `[x] completed`
+  - Mark 2.4 `[x] completed`
 
-**Sub-agente 2 — services**
+**Sub-agent 2 — services**
 - Execute 2.5: crie `passkeys-app/services/api.ts` com as 4 funções conforme spec da subtarefa
   - BASE_URL = `'https://localhost:3000'`
-  - Marque 2.5 `[x] completed`
+  - Mark 2.5 `[x] completed`
 - Execute 2.8 (depende de 2.5): setup Jest no app + crie `passkeys-app/services/__tests__/api.test.ts`
   - Instale `jest @types/jest jest-fetch-mock ts-jest` como devDependencies
   - Implemente os casos de teste listados na subtarefa 2.8
   - Verifique: `cd passkeys-app && npm test` passa
-  - Marque 2.8 `[x] completed` ou `[!] blocked`
+  - Mark 2.8 `[x] completed` ou `[!] blocked`
 
 **Aguarde ambos os sub-agentes concluírem** antes de avançar.
 
@@ -197,27 +197,27 @@ Execute **2.6** (depende de 2.1 e 2.5):
 - Leia `passkeys-app/app/index.tsx` atual
 - Substitua pelo conteúdo conforme spec da subtarefa 2.6
 - Verifique que TypeScript compila sem erros
-- Marque 2.6 `[x] completed`
+- Mark 2.6 `[x] completed`
 
-### BATCH C — sequencial
+### BATCH C — sequential
 Execute **2.7** (depende de 2.6):
 - Leia `passkeys-app/app/(tabs)/index.tsx` atual
 - Substitua pelo conteúdo conforme spec da subtarefa 2.7
-- Marque 2.7 `[x] completed`
+- Mark 2.7 `[x] completed`
 
 ### Verificação final
 - Rode `cd passkeys-app && npx expo run:android` no emulador
 - App abre sem crash na tela de login/registro → fase completa
 
-### Finalização
-- Todos completos → atualize `Status da fase` para `[x] completed` com `Concluído em`
-- Algum bloqueio → atualize `Status da fase` para `[!] blocked` e registre em Blockers
+### Wrap-up
+- All done → set **Phase status** to `[x] completed` with **Completed at**
+- Any block → set **Phase status** to `[!] blocked` and record under Blockers
 
 ---
 
 ## Blockers
 
-_Nenhum bloqueio registrado._
+_No blockers recorded._
 
 ---
 
@@ -233,10 +233,10 @@ _Nenhum bloqueio registrado._
 
 ## Token Usage
 
-> Preencha com o valor exibido na UI do Claude Code ou Cursor ao final da fase.
+> Fill with the value shown in the Claude Code or Cursor UI at the end of the phase.
 
-| Campo | Valor |
+| Field | Value |
 |-------|-------|
-| Ferramenta | Cursor (Sonnet 4.6) |
-| Tokens consumidos | — |
-| Observação | — |
+| Tool | Cursor (Sonnet 4.6) |
+| Tokens consumed | — |
+| Notes | — |

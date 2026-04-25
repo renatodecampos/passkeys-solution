@@ -1,31 +1,31 @@
 # passkeys-app
 
-Cliente **Expo dev build** da POC de passkeys (WebAuthn). Não use **Expo Go** — o fluxo nativo exige `expo-dev-client`.
+**Expo dev build** client for the passkeys (WebAuthn) PoC. Do **not** use **Expo Go** — the native flow requires `expo-dev-client`.
 
-## Documentação do repositório
+## Repository documentation
 
-Setup completo (Docker, HTTPS com mkcert, `adb reverse`, variáveis do servidor, fingerprint Android): [`../CLAUDE.md`](../CLAUDE.md).
+Full setup (Docker, HTTPS with mkcert, `adb reverse`, server env vars, Android fingerprint): [`../CLAUDE.md`](../CLAUDE.md).
 
-## Comandos
+## Commands
 
-| Comando | Uso |
-|---------|-----|
-| `npx expo run:android` | Build e instala no emulador/dispositivo |
-| `npm start` | Metro / dev server (após build nativo) |
-| `npm test` | Jest (`services/api.ts` e testes associados) |
-| `npm run lint` | ESLint (script no `package.json` chama o binário em `node_modules`) |
+| Command | Purpose |
+|---------|---------|
+| `npx expo run:android` | Build and install on emulator/device |
+| `npm start` | Metro / dev server (after native build) |
+| `npm test` | Jest (`services/api.ts` and related tests) |
+| `npm run lint` | ESLint (script in `package.json` calls the binary in `node_modules`) |
 
-## Demo do fluxo UX (RFC-0002)
+## UX flow demo (RFC-0002)
 
-1. Infra: `docker-compose up -d`, server em `passkeys-server` (`npm run dev`), `adb reverse tcp:3000 tcp:3000`.
-2. Abra o app, introduza um username.
-3. **Create passkey** ou **Sign in with passkey** e conclua o prompt do sistema.
-4. A rota `/home` mostra a prova resumida da verificação (`verified`, método `passkey`, etc.). **Logout** volta à entrada (`/`).
+1. Infra: `docker-compose up -d`, server in `passkeys-server` (`npm run dev`), `adb reverse tcp:3000 tcp:3000`.
+2. Open the app, enter a username.
+3. **Create passkey** or **Sign in with passkey** and complete the system prompt.
+4. The `/home` route shows a short verification proof (`verified`, `passkey` method, etc.). **Logout** returns to the entry screen (`/`).
 
-Rotas principais: `app/index.tsx` (entrada), `app/home.tsx` (autenticado). HTTP apenas em `services/api.ts`.
+Main routes: `app/index.tsx` (entry), `app/home.tsx` (authenticated). HTTP only in `services/api.ts`.
 
 ---
 
-## Expo (referência)
+## Expo (reference)
 
-Este projeto foi criado com [`create-expo-app`](https://www.npmjs.com/package/create-expo-app). Documentação: [Expo](https://docs.expo.dev/), [Expo Router](https://docs.expo.dev/router/introduction/), [development builds](https://docs.expo.dev/develop/development-builds/introduction/).
+This app was created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app). Docs: [Expo](https://docs.expo.dev/), [Expo Router](https://docs.expo.dev/router/introduction/), [development builds](https://docs.expo.dev/develop/development-builds/introduction/).

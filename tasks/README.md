@@ -1,54 +1,53 @@
 # Task tracking
 
-Cada **RFC** tem uma pasta `tasks/rfc-<número>/` com os arquivos de status daquela iniciativa. Os
-números de fase (1, 2, 3, …) **recomeçam em cada RFC**.
+Each **RFC** has a folder `tasks/rfc-<number>/` with status files for that initiative. Phase numbers (1, 2, 3, …) **restart for each RFC**.
 
-Templates compartilhados (raiz de `tasks/`):
+Shared templates (under `tasks/`):
 
-- `tasks/_template-fase.md` — base para criar novas fases
+- `tasks/_template-fase.md` — base for new phases
 
 ## RFC-0001 — `tasks/rfc-0001/`
 
-| Arquivo | Fase | Descrição |
-|---------|------|-----------|
-| `fase-1-status.md` | 1 | Infraestrutura e HTTPS no server |
-| `fase-1b-testes-server.md` | 1b | Testes unitários do server (Jest + ts-jest) |
-| `fase-2-status.md` | 2 | App Android (prebuild, passkeys, telas, testes de api.ts) |
-| `fase-3-status.md` | 3 | Integração, certificados no emulador, testes E2E |
-| `fase-4-documentacao.md` | 4 | Documentação consolidada (CLAUDE.md, READMEs, RFC → completed) |
-| `token-report.md` | — | Consolidação de tokens (RFC-0001) |
+| File | Phase | Description |
+|------|-------|-------------|
+| `fase-1-status.md` | 1 | Server infrastructure and HTTPS |
+| `fase-1b-testes-server.md` | 1b | Server unit tests (Jest + ts-jest) |
+| `fase-2-status.md` | 2 | Android app (prebuild, passkeys, screens, api.ts tests) |
+| `fase-3-status.md` | 3 | Integration, emulator certificates, E2E tests |
+| `fase-4-documentacao.md` | 4 | Consolidated documentation (CLAUDE.md, READMEs, RFC → completed) |
+| `token-report.md` | — | Token consolidation (RFC-0001) |
 
 ## RFC-0002 — `tasks/rfc-0002/`
 
-| Arquivo | Fase | Descrição |
-|---------|------|-----------|
-| `fase-1-ux-app.md` | 1 | UX do app Android |
-| `fase-2-ux-validacao.md` | 2 | Validação UX e E2E |
-| `fase-3-documentacao.md` | 3 | Documentação (RFC-0002 → completed) |
-| `token-report.md` | — | Consolidação de tokens (RFC-0002), criado na fase 3 |
+| File | Phase | Description |
+|------|-------|-------------|
+| `fase-1-ux-app.md` | 1 | Android app UX |
+| `fase-2-ux-validacao.md` | 2 | UX and E2E validation |
+| `fase-3-documentacao.md` | 3 | Documentation (RFC-0002 → completed) |
+| `token-report.md` | — | Token consolidation (RFC-0002), created in phase 3 |
 
-## Legenda de status
+## Status legend
 
 ```
-[ ] pending      — ainda não iniciado
-[~] in_progress  — em andamento
-[x] completed    — concluído e verificado
-[!] blocked      — bloqueado (veja seção Blockers do arquivo)
-[-] skipped      — ignorado com justificativa
+[ ] pending      — not started
+[~] in_progress  — in progress
+[x] completed    — done and verified
+[!] blocked      — blocked (see Blockers in the file)
+[-] skipped      — skipped with justification
 ```
 
-## Referência rápida
+## Quick reference
 
-- Criar harness para uma nova RFC: `AGENTS.md` seção 0
-- `../rfcs/_template-rfc.md` — base para novas RFCs
-- `../AGENTS.md` — comandos `/feature-dev` e regras para agentes
-- `tasks/feedback-forward.md` — acumulador cross-RFC de insights de cada fase concluída
+- Create harness for a new RFC: `AGENTS.md` section 0
+- `../rfcs/_template-rfc.md` — base for new RFCs
+- `../AGENTS.md` — `/feature-dev` commands and agent rules
+- `tasks/feedback-forward.md` — cross-RFC log of insights from each completed phase
 
-Para scaffoldar uma nova RFC completa: `/feature-dev cria harness para a RFC-XXXX`
+To scaffold a full new RFC: `/feature-dev create harness for RFC-XXXX`
 
-## Convenções
+## Conventions
 
-- Cada agente atualiza o arquivo de status ao **iniciar** e ao **concluir** cada subtarefa
-- Fases são sequenciais **dentro** de uma RFC; entre RFCs, siga a cadência e pré-requisitos de cada fase
-- Dentro de uma fase, subtarefas sem dependência podem rodar em paralelo
-- Ver `AGENTS.md` seção 0 para o processo completo
+- Each agent updates the status file when **starting** and when **completing** each subtask
+- Phases are sequential **within** an RFC; across RFCs, follow each phase’s cadence and prerequisites
+- Within a phase, subtasks with no dependency may run in parallel
+- See `AGENTS.md` section 0 for the full process

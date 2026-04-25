@@ -2,95 +2,99 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-## Project Overview
+## Project overview
 
 A passkeys (WebAuthn/FIDO2) passwordless authentication system with two components:
 - **passkeys-server**: TypeScript/Fastify backend
 - **passkeys-app**: Expo/React Native cross-platform frontend
 
-## Setup do ambiente (novo desenvolvedor)
+## Environment setup (new developer)
 
-### Pré-requisitos
+### Prerequisites
 
 - Node.js 20+
-- Docker (para MongoDB e Redis)
+- Docker (for MongoDB and Redis)
 - [mkcert](https://github.com/FiloSottile/mkcert) — `brew install mkcert`
-- Android Studio com emulador API 34+ (imagem "Google APIs", **não** "Google Play")
+- Android Studio with API 34+ emulator (image **"Google APIs"**, not **"Google Play"**)
 
-### Gerar certificados HTTPS
+### Generate HTTPS certificates
 
 ```bash
-mkcert -install          # instala a CA no sistema (requer senha sudo — execute manualmente)
+mkcert -install          # installs the CA on the system (requires sudo — run manually)
 cd passkeys-server/certs
 mkcert localhost 127.0.0.1 ::1
-# gera: localhost+2.pem e localhost+2-key.pem
+# creates: localhost+2.pem and localhost+2-key.pem
 ```
 
-A rootCA fica em `/Users/<you>/Library/Application Support/mkcert`.
+The root CA lives at `/Users/<you>/Library/Application Support/mkcert`.
 
-### Iniciar infraestrutura
+### Start infrastructure
 
 ```bash
 docker-compose up -d     # MongoDB 7 (27017) + Redis 7 (6379)
 ```
 
-### Iniciar o server
+### Start the server
 
-O server roda **sempre via HTTPS**.
+The server always runs over **HTTPS**.
 
 ```bash
 cd passkeys-server
 npm run dev
-# verificação: curl -k https://localhost:3000/health → {"status":"ok"}
+# check: curl -k https://localhost:3000/health → {"status":"ok"}
 ```
 
-### Port forwarding para o emulador
+### Port forwarding for the emulator
 
-Necessário para o app Android acessar `https://localhost:3000`.  
-**Reexecutar sempre que o emulador reiniciar.**
+Required so the Android app can reach `https://localhost:3000`.  
+**Run again whenever the emulator restarts.**
 
 ```bash
 adb reverse tcp:3000 tcp:3000
 ```
 
-### Build e install do app no emulador
+### Build and install the app on the emulator
 
 ```bash
 cd passkeys-app
 npx expo run:android
 ```
 
-### Configuração única do emulador (feita uma vez)
+### One-time emulator setup
 
-**Instalar CA do mkcert:**
+**Install the mkcert CA:**
+
 ```bash
 adb push "$(mkcert -CAROOT)/rootCA.pem" /sdcard/rootCA.pem
 ```
-No emulador: Settings → Security → Install from storage → `rootCA.pem` → instalar como "CA certificate".
 
-**Configurar biometria virtual:**  
-Settings → Security → Fingerprint → adicionar impressão digital virtual.
+On the emulator: Settings → Security → Install from storage → `rootCA.pem` → install as "CA certificate".
+
+**Virtual biometrics:**  
+Settings → Security → Fingerprint → add a virtual fingerprint.
 
 ---
 
 ## Commands
 
 ### passkeys-server
+
 ```bash
 cd passkeys-server
 npm run dev      # Development server with hot-reload (ts-node + nodemon)
 npm run build    # Compile TypeScript to dist/
 npm start        # Run compiled server
-npm test         # Jest (cobertura ≥ 80%)
+npm test         # Jest (coverage ≥ 80%)
 npm run test:watch
 ```
 
 ### passkeys-app
+
 ```bash
 cd passkeys-app
-npx expo run:android   # Build e instala no emulador/device (usa expo-dev-client, não Expo Go)
-npm start              # Expo dev server (sem build nativo)
-npm run lint           # ESLint (script no package.json do app chama o binário em node_modules)
+npx expo run:android   # Build and install on emulator/device (expo-dev-client, not Expo Go)
+npm start              # Expo dev server (no native build)
+npm run lint           # ESLint (app package.json script invokes the binary in node_modules)
 npm test               # Jest (services/api.ts)
 ```
 
@@ -112,18 +116,18 @@ infra/database/redis.ts     # Redis client (challenge storage with 5-min TTL)
 infra/logger.ts             # Winston logger
 ```
 
-**WebAuthn flow**: Client request → Fastify route → registration/authentication module → MongoDB (user/credential persistence) + Redis (challenge temp storage)
+**WebAuthn flow:** Client request → Fastify route → registration/authentication module → MongoDB (user/credential persistence) + Redis (temporary challenge storage)
 
 ### App (`passkeys-app/app/`)
 
 File-based routing via Expo Router (similar to Next.js):
 - `_layout.tsx` — root Stack + Theme layout
-- `index.tsx` — entrada pública (Calm Card, registro/login com passkey — RFC-0002)
-- `home.tsx` — tela autenticada (Home Proof: verificação resumida do servidor)
-- `(tabs)/` — grupo de tabs (ex.: explore); fluxo passkey usa `/` e `/home`
+- `index.tsx` — public entry (Calm Card, register/sign in with passkey — RFC-0002)
+- `home.tsx` — authenticated screen (Home Proof: short server verification)
+- `(tabs)/` — tab group (e.g. explore); passkey flow uses `/` and `/home`
 - Path alias `@/*` maps to project root
 
-## Environment Variables
+## Environment variables
 
 Copy `.env-example` in `passkeys-server/` before running the server. Required variables:
 
@@ -131,23 +135,24 @@ Copy `.env-example` in `passkeys-server/` before running the server. Required va
 |---|---|
 | `RP_ID`, `RP_NAME`, `RP_ORIGIN` | WebAuthn relying party config (`RP_ORIGIN=https://localhost:3000`) |
 | `MONGODB_URI`, `DB_NAME`, `COLLECTION_NAME` | MongoDB connection |
-| `REDIS_URL` | Redis URL completa (ex: `redis://localhost:6379`) |
+| `REDIS_URL` | Full Redis URL (e.g. `redis://localhost:6379`) |
 | `SESSION_SECRET` | Secure cookie signing |
-| `ANDROID_CERT_FINGERPRINT` | SHA256 do debug keystore Android |
-| `ANDROID_ORIGIN` | Origin Android para WebAuthn (ex: `android:apk-key-hash:<base64>`) |
+| `ANDROID_CERT_FINGERPRINT` | SHA-256 of the Android debug keystore |
+| `ANDROID_ORIGIN` | Android WebAuthn origin (e.g. `android:apk-key-hash:<base64>`) |
 
-Para obter `ANDROID_CERT_FINGERPRINT`:
+To obtain `ANDROID_CERT_FINGERPRINT`:
+
 ```bash
 keytool -list -v \
   -keystore passkeys-app/android/app/debug.keystore \
   -alias androiddebugkey -storepass android -keypass android
-# Copiar o valor SHA256: AA:BB:CC:...
+# Copy the SHA-256 value: AA:BB:CC:...
 ```
 
-## Testes
+## Tests
 
 ```bash
-# Server (Jest v29 — flag --testPathPatterns com "s" no plural)
+# Server (Jest v29 — use --testPathPatterns with a plural “s”)
 cd passkeys-server && npm test
 cd passkeys-server && npm run test:watch
 
@@ -155,30 +160,30 @@ cd passkeys-server && npm run test:watch
 cd passkeys-app && npm test
 ```
 
-> **Dependência de setup do app**: o arquivo `jest.config.ts` usa sintaxe TypeScript. Para que o Jest o execute, `ts-node` deve estar instalado como devDependency no `passkeys-app`:
+> **App setup dependency:** `jest.config.ts` uses TypeScript. For Jest to run it, `ts-node` must be installed as a devDependency in `passkeys-app`:
 > ```bash
 > cd passkeys-app && npm install --save-dev ts-node
 > ```
 
-## Agent Harness
+## Agent harness
 
-Este projeto usa execução assistida por agentes com rastreamento de estado em arquivos:
+This project uses agent-assisted execution with state tracked in files:
 
-- `AGENTS.md` — regras de arquitetura e convenções que todos os agentes devem seguir
-- `tasks/rfc-0001/fase-1-status.md` — Infraestrutura e HTTPS no server
-- `tasks/rfc-0001/fase-1b-testes-server.md` — Testes unitários do server
-- `tasks/rfc-0001/fase-2-status.md` — App Android (prebuild, passkeys, telas)
-- `tasks/rfc-0001/fase-3-status.md` — Integração, certificados no emulador, testes E2E
-- `tasks/rfc-0002/fase-1-ux-app.md` — UX do app (RFC-0002)
-- `tasks/rfc-0002/fase-2-ux-validacao.md` — validação UX/E2E (RFC-0002)
-- `tasks/rfc-0002/fase-3-documentacao.md` — documentação final (RFC-0002)
-- `rfcs/completed/RFC-0001-passkeys-poc-completion.md` — plano base
-- `rfcs/completed/RFC-0002-ux-passkeys-poc.md` — evolução UX (concluída)
+- `AGENTS.md` — architecture rules and conventions all agents must follow
+- `tasks/rfc-0001/fase-1-status.md` — server infrastructure and HTTPS
+- `tasks/rfc-0001/fase-1b-testes-server.md` — server unit tests
+- `tasks/rfc-0001/fase-2-status.md` — Android app (prebuild, passkeys, screens)
+- `tasks/rfc-0001/fase-3-status.md` — integration, emulator certificates, E2E tests
+- `tasks/rfc-0002/fase-1-ux-app.md` — app UX (RFC-0002)
+- `tasks/rfc-0002/fase-2-ux-validacao.md` — UX/E2E validation (RFC-0002)
+- `tasks/rfc-0002/fase-3-documentacao.md` — final documentation (RFC-0002)
+- `rfcs/completed/RFC-0001-passkeys-poc-completion.md` — base plan
+- `rfcs/completed/RFC-0002-ux-passkeys-poc.md` — UX evolution (completed)
 
-Fases são sequenciais. Dentro de cada fase, subtarefas sem dependência podem rodar em paralelo.
-Consulte `tasks/README.md` para a legenda de status.
+Phases are sequential. Within a phase, subtasks with no dependency may run in parallel.  
+See `tasks/README.md` for the status legend.
 
-## Key Dependencies
+## Key dependencies
 
-**Server**: Fastify 5.x, `@simplewebauthn/server` 13.x, MongoDB 6.x, ioredis 5.x, Winston  
-**App**: Expo SDK 53, React 19, React Native 0.79, Expo Router 5
+**Server:** Fastify 5.x, `@simplewebauthn/server` 13.x, MongoDB 6.x, ioredis 5.x, Winston  
+**App:** Expo SDK 53, React 19, React Native 0.79, Expo Router 5

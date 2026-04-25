@@ -1,19 +1,19 @@
-# Fase 2 — Validação UX e E2E (RFC-0002)
+# Phase 2 — UX validation and E2E (RFC-0002)
 
-**Status da fase**: `[x] completed`
-**Agente responsável**: Cursor Agent
-**Iniciado em**: 2026-04-25T18:00:00Z
-**Concluído em**: 2026-04-26T12:00:00Z
+**Phase status**: `[x] completed`
+**Owning agent**: Cursor Agent
+**Started at**: 2026-04-25T18:00:00Z
+**Completed at**: 2026-04-26T12:00:00Z
 
 ---
 
-## Pré-requisito
+## Prerequisite
 
 `tasks/rfc-0002/fase-1-ux-app.md` deve estar `[x] completed`.
 
 ---
 
-## Critério de conclusão
+## Completion criterion
 
 ```bash
 cd passkeys-app && npm test && npm run lint
@@ -25,35 +25,35 @@ registro → Home Proof → logout → login → Home Proof.
 
 ---
 
-## Subtarefas
+## Subtasks
 
 ### 2.1 — Testes unitários do app
 - **Status**: `[x] completed`
 - **depends_on**: []
-- **Arquivo**: `passkeys-app/services/__tests__/api.test.ts`
-- **O que fazer**: Ajustar testes caso `services/api.ts` tenha novo shape de erro ou parsing de resposta.
-- **Verificação**: `cd passkeys-app && npm test` passa.
+- **File**: `passkeys-app/services/__tests__/api.test.ts`
+- **What to do**: Ajustar testes caso `services/api.ts` tenha novo shape de erro ou parsing de resposta.
+- **Verification**: `cd passkeys-app && npm test` passa.
 
 ### 2.2 — Validação do fluxo feliz no emulador
 - **Status**: `[x] completed`
 - **depends_on**: [2.1]
-- **Arquivo**: —
-- **O que fazer**: Com server e app rodando, validar registro, Home Proof, logout, login e Home Proof usando o mesmo username.
-- **Verificação**: Registro e login exibem `verified: true` na home.
+- **File**: —
+- **What to do**: Com server e app rodando, validar registro, Home Proof, logout, login e Home Proof usando o mesmo username.
+- **Verification**: Registro e login exibem `verified: true` na home.
 
 ### 2.3 — Validação de estados de falha
 - **Status**: `[x] completed`
 - **depends_on**: [2.1]
-- **Arquivo**: —
-- **O que fazer**: Validar username vazio, cancelamento do prompt nativo e servidor local indisponível.
-- **Verificação**: Cada cenário exibe mensagem inline útil e não deixa a tela em loading permanente.
+- **File**: —
+- **What to do**: Validar username vazio, cancelamento do prompt nativo e servidor local indisponível.
+- **Verification**: Cada cenário exibe mensagem inline útil e não deixa a tela em loading permanente.
 
 ### 2.4 — Validação keyboard-safe e acessibilidade básica
 - **Status**: `[x] completed`
 - **depends_on**: [2.2, 2.3]
-- **Arquivo**: `passkeys-app/app/index.tsx`, `passkeys-app/app/home.tsx`
-- **O que fazer**: Verificar teclado aberto, labels visíveis, touch targets, contraste e feedback textual.
-- **Verificação**: Input, ações e mensagens permanecem visíveis/usáveis no emulador.
+- **File**: `passkeys-app/app/index.tsx`, `passkeys-app/app/home.tsx`
+- **What to do**: Verificar teclado aberto, labels visíveis, touch targets, contraste e feedback textual.
+- **Verification**: Input, ações e mensagens permanecem visíveis/usáveis no emulador.
 
 ---
 
@@ -68,20 +68,20 @@ registro → Home Proof → logout → login → Home Proof.
 
 ---
 
-## Instruções para o Orquestrador
+## Orchestrator instructions
 
-> Estas instruções são lidas automaticamente quando você executa `/feature-dev execute RFC-0002 fase 2`
+> These instructions apply when you run `/feature-dev execute RFC-0002 phase 2`
 
-**Pré-condição**: verifique que `tasks/rfc-0002/fase-1-ux-app.md` está `[x] completed`. Se não estiver, pare e informe.
+**Precondition:** confirm `tasks/rfc-0002/fase-1-ux-app.md` is `[x] completed`. If not, stop and report.
 
-**Ao iniciar**: atualize o cabeçalho deste arquivo — `Status da fase` para `[~] in_progress`, `Agente responsável` com seu nome, `Iniciado em` com timestamp ISO.
+**On start:** update this file’s header — set **Phase status** to `[~] in_progress`, **Owning agent** to your name, **Started at** to an ISO timestamp.
 
-### BATCH A — sequencial
+### BATCH A — sequential
 
 Execute **2.1**:
 - Rode `cd passkeys-app && npm test`
 - Se testes falharem por mudança intencional de API, ajuste `passkeys-app/services/__tests__/api.test.ts`
-- Marque 2.1 `[x] completed` ou `[!] blocked`
+- Mark 2.1 `[x] completed` ou `[!] blocked`
 
 ### BATCH B — manual/sequencial
 
@@ -90,26 +90,26 @@ Execute **2.2** e **2.3**:
 - Use `cd passkeys-app && npx expo run:android` se o app ainda não estiver instalado
 - Valide fluxo feliz e falhas descritas nas subtarefas
 - Registre evidências no campo Notas
-- Marque cada subtarefa `[x] completed` ou `[!] blocked`
+- Mark cada subtarefa `[x] completed` ou `[!] blocked`
 
-### BATCH C — sequencial
+### BATCH C — sequential
 
 Execute **2.4**:
 - Foque o username para abrir o teclado
 - Verifique labels, touch targets, contraste e status textual
 - Registre gaps no campo Notas
-- Marque 2.4 `[x] completed` ou `[!] blocked`
+- Mark 2.4 `[x] completed` ou `[!] blocked`
 
-### Finalização
+### Wrap-up
 - Rode `cd passkeys-app && npm test && npm run lint`
-- Todos completos e verificação passando → atualize `Status da fase` para `[x] completed` com `Concluído em`
-- Algum bloqueio → atualize `Status da fase` para `[!] blocked` e registre em Blockers
+- All done and checks pass → set **Phase status** to `[x] completed` with **Completed at**
+- Any block → set **Phase status** to `[!] blocked` and record under Blockers
 
 ---
 
 ## Blockers
 
-_Nenhum bloqueio registrado._
+_No blockers recorded._
 
 ---
 
@@ -124,9 +124,9 @@ _Nenhum bloqueio registrado._
 
 ## Token Usage
 
-| Campo | Valor |
+| Field | Value |
 |-------|-------|
-| Ferramenta | Cursor (agente, execução / fecho fase 2) |
-| Tokens consumidos | 109k (≈109.0k) |
+| Tool | Cursor (agente, execução / fecho fase 2) |
+| Tokens consumed | 109k (≈109.0k) |
 | Janela de contexto | 54,3% utilizada |
-| Observação | Medição informada pelo utilizador após conclusão dos testes e fecho desta fase. |
+| Notes | Medição informada pelo utilizador após conclusão dos testes e fecho desta fase. |

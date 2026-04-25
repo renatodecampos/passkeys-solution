@@ -11,10 +11,10 @@ export default function HomeScreen() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.greeting}>Olá, {username ?? 'usuário'}!</Text>
-      <Text style={styles.subtitle}>Você está autenticado com passkey.</Text>
+      <Text style={styles.greeting}>Hello, {username ?? 'user'}!</Text>
+      <Text style={styles.subtitle}>You are signed in with a passkey.</Text>
       <TouchableOpacity style={styles.btn} onPress={handleLogout}>
-        <Text style={styles.btnText}>Sair</Text>
+        <Text style={styles.btnText}>Sign out</Text>
       </TouchableOpacity>
     </View>
   );

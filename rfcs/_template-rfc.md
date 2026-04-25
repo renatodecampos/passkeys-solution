@@ -17,21 +17,21 @@ decision_date:
 
 ## Background & Context
 
-### Estado atual
+### Current state
 
 {{ESTADO_ATUAL_DO_SISTEMA}}
 
-### Glossário
+### Glossary
 
-| Termo | Significado |
-|-------|-------------|
+| Term | Definition |
+|------|------------|
 | {{TERMO}} | {{DEFINICAO}} |
 
 ## Problem Statement
 
 {{PROBLEMA_ESPECIFICO}}
 
-**Impacto de não resolver**: {{CUSTO_RISCO_OU_OPORTUNIDADE}}
+**If we do not address this**: {{CUSTO_RISCO_OU_OPORTUNIDADE}}
 
 ## Goals & Non-Goals
 
@@ -43,35 +43,35 @@ decision_date:
 
 ## Evaluation Criteria
 
-| Critério | Peso | Descrição |
-|----------|------|-----------|
-| {{CRITERIO}} | Alto/Médio/Baixo | {{DESCRICAO}} |
+| Criterion | Weight | Description |
+|----------|--------|-------------|
+| {{CRITERIO}} | High / Medium / Low | {{DESCRICAO}} |
 
 ## Options Analysis
 
-### Opção 1: {{NOME}}
+### Option 1: {{NOME}}
 
-**Descrição**: {{DESCRICAO}}
+**Description**: {{DESCRICAO}}
 
-**Vantagens**:
+**Pros**:
 - {{PRO}}
 
-**Desvantagens**:
+**Cons**:
 - {{CON}}
 
-**Avaliação contra critérios**:
-| Critério | Avaliação | Notas |
-|----------|-----------|-------|
+**Scoring**:
+| Criterion | Score | Notes |
+|----------|-------|-------|
 | {{CRITERIO}} | {{AVALIACAO}} | {{NOTA}} |
 
-**Esforço**: {{ESTIMATIVA}}
-**Risco**: {{RISCO}}
+**Effort**: {{ESTIMATIVA}}  
+**Risk**: {{RISCO}}
 
 ---
 
-### Opção 2: {{NOME}}
+### Option 2: {{NOME}}
 
-<!-- Repita a estrutura acima -->
+<!-- Repeat the structure above -->
 
 ## Recommendation
 
@@ -89,28 +89,27 @@ decision_date:
 
 ## Implementation Plan
 
-### Fase 1 — {{TITULO}}
+### Phase 1 — {{TITULO}}
 
-| Passo | Arquivo(s) | Descrição |
-|-------|-----------|-----------|
+| Step | File(s) | Description |
+|------|---------|-------------|
 | 1.1 | `{{ARQUIVO}}` | {{DESCRICAO}} |
 
-**Critério de conclusão**: {{COMANDO_E_SAIDA_ESPERADA}}
+**Completion criterion**: {{COMANDO_E_SAIDA_ESPERADA}}
 
-<!-- Adicione mais fases conforme necessário -->
+<!-- Add more phases as needed -->
 
-### Fase N — Documentação
+### Phase N — Documentation
 
-Última fase de toda RFC. Executada após todas as demais estarem `[x] completed`.
-Arquivo de tasks da última fase (documentação): `tasks/rfc-XXXX/fase-N-documentacao.md` (pasta
-por RFC, use `tasks/_template-fase.md` como base).
+Last phase of every RFC. Run after all others are `[x] completed`.  
+Task file for the last phase: `tasks/rfc-XXXX/fase-N-documentacao.md` (per-RFC folder; use `tasks/_template-fase.md` as the base).
 
-Escopo fixo:
-- Atualizar `CLAUDE.md` com setup não óbvio e decisões técnicas relevantes
-- Atualizar READMEs afetados
-- Mover RFC para `rfcs/completed/` e preencher `## Decision Record`
+Fixed scope:
+- Update `CLAUDE.md` with non-obvious setup and relevant technical decisions
+- Update affected READMEs
+- Move RFC to `rfcs/completed/` and complete `## Decision Record`
 
-**Critério de conclusão**: novo dev consegue subir o ambiente lendo apenas `CLAUDE.md`.
+**Completion criterion:** a new developer can bring up the environment using only `CLAUDE.md`.
 
 ### Rollback
 
@@ -122,4 +121,4 @@ Escopo fixo:
 
 ## Decision Record
 
-_A ser preenchido após revisão._
+_To be filled in after review._

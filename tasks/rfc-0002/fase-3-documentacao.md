@@ -1,58 +1,58 @@
-# Fase 3 — Documentação (RFC-0002)
+# Phase 3 — Documentation (RFC-0002)
 
-**Status da fase**: `[x] completed`
-**Agente responsável**: Cursor Agent
-**Iniciado em**: 2026-04-25T20:00:00Z
-**Concluído em**: 2026-04-25T22:00:00Z
-
----
-
-## Pré-requisito
-
-`tasks/rfc-0002/fase-2-ux-validacao.md` deve estar `[x] completed`.
+**Phase status**: `[x] completed`
+**Owning agent**: Cursor Agent
+**Started at**: 2026-04-25T20:00:00Z
+**Completed at**: 2026-04-25T22:00:00Z
 
 ---
 
-## Critério de conclusão
+## Prerequisite
+
+`tasks/rfc-0002/fase-2-ux-validacao.md` must be `[x] completed`.
+
+---
+
+## Completion criterion
 
 ```bash
 test -f rfcs/completed/RFC-0002-ux-passkeys-poc.md
-# arquivo existe em rfcs/completed e Decision Record está preenchido
+# file exists in rfcs/completed and Decision Record is filled in
 ```
 
-A fase só está completa quando a documentação reflete o estado real da UX implementada.
+The phase is complete only when the documentation reflects the real state of the implemented UX.
 
 ---
 
-## Subtarefas
+## Subtasks
 
 ### 3.1 — Revisar notas das fases 1 e 2
 - **Status**: `[x] completed`
 - **depends_on**: []
-- **Arquivo**: `tasks/rfc-0002/fase-1-ux-app.md`, `tasks/rfc-0002/fase-2-ux-validacao.md`
-- **O que fazer**: Consolidar decisões, evidências e gaps relevantes para documentação.
-- **Verificação**: Campo Notas desta fase contém o que deve ser documentado.
+- **File**: `tasks/rfc-0002/fase-1-ux-app.md`, `tasks/rfc-0002/fase-2-ux-validacao.md`
+- **What to do**: Consolidar decisões, evidências e gaps relevantes para documentação.
+- **Verification**: Campo Notas desta fase contém o que deve ser documentado.
 
 ### 3.2 — Atualizar documentação do projeto
 - **Status**: `[x] completed`
 - **depends_on**: [3.1]
-- **Arquivo**: `CLAUDE.md`, `passkeys-app/README.md`
-- **O que fazer**: Atualizar somente se a UX implementada criar setup, comando ou orientação de demo que não esteja documentado.
-- **Verificação**: Documentação não duplica a RFC e continua útil para novo avaliador.
+- **File**: `CLAUDE.md`, `passkeys-app/README.md`
+- **What to do**: Atualizar somente se a UX implementada criar setup, comando ou orientação de demo que não esteja documentado.
+- **Verification**: Documentação não duplica a RFC e continua útil para novo avaliador.
 
 ### 3.3 — Concluir RFC-0002
 - **Status**: `[x] completed`
 - **depends_on**: [3.1, 3.2]
-- **Arquivo**: `rfcs/completed/RFC-0002-ux-passkeys-poc.md` (anteriormente em `rfcs/draft/`)
-- **O que fazer**: Mover a RFC para `rfcs/completed/`, alterar `status: COMPLETED`, preencher `decision_date` e `## Decision Record`.
-- **Verificação**: RFC final está em `rfcs/completed/RFC-0002-ux-passkeys-poc.md`.
+- **File**: `rfcs/completed/RFC-0002-ux-passkeys-poc.md` (anteriormente em `rfcs/draft/`)
+- **What to do**: Mover a RFC para `rfcs/completed/`, alterar `status: COMPLETED`, preencher `decision_date` e `## Decision Record`.
+- **Verification**: RFC final está em `rfcs/completed/RFC-0002-ux-passkeys-poc.md`.
 
 ### 3.4 — Relatório de tokens RFC-0002
 - **Status**: `[x] completed`
 - **depends_on**: [3.1]
-- **Arquivo**: `tasks/rfc-0002/token-report.md`
-- **O que fazer**: Consolidar `## Token Usage` das fases 1, 2 e 3 desta RFC.
-- **Verificação**: Relatório criado com valores informados ou marcados como `não informado`.
+- **File**: `tasks/rfc-0002/token-report.md`
+- **What to do**: Consolidar `## Token Usage` das fases 1, 2 e 3 desta RFC.
+- **Verification**: Relatório criado com valores informados ou marcados como `não informado`.
 
 ---
 
@@ -63,57 +63,57 @@ A fase só está completa quando a documentação reflete o estado real da UX im
 3.1 → 3.4 ─┤→ 3.3
 ```
 
-3.2 e 3.4 podem rodar em paralelo após 3.1.
+3.2 and 3.4 can run in parallel after 3.1.
 
 ---
 
-## Instruções para o Orquestrador
+## Orchestrator instructions
 
-> Estas instruções são lidas automaticamente quando você executa `/feature-dev execute RFC-0002 fase 3`
+> These instructions apply when you run `/feature-dev execute RFC-0002 phase 3`
 
-**Pré-condição**: verifique que `tasks/rfc-0002/fase-2-ux-validacao.md` está `[x] completed`. Se não estiver, pare e informe.
+**Precondition:** confirm `tasks/rfc-0002/fase-2-ux-validacao.md` is `[x] completed`. If not, stop and report.
 
-**Ao iniciar**: atualize o cabeçalho deste arquivo — `Status da fase` para `[~] in_progress`, `Agente responsável` com seu nome, `Iniciado em` com timestamp ISO.
+**On start:** update this file’s header — set **Phase status** to `[~] in_progress`, **Owning agent** to your name, **Started at** to an ISO timestamp.
 
-### BATCH A — sequencial
+### BATCH A — sequential
 
-Execute **3.1**:
-- Leia os campos `## Notas` de `tasks/rfc-0002/fase-1-ux-app.md` e `tasks/rfc-0002/fase-2-ux-validacao.md`
-- Consolide aqui o que é relevante documentar
-- Marque 3.1 `[x] completed`
+Run **3.1**:
+- Read the `## Notas` sections in `tasks/rfc-0002/fase-1-ux-app.md` and `tasks/rfc-0002/fase-2-ux-validacao.md`
+- Consolidate what matters for documentation here
+- Mark 3.1 `[x] completed`
 
-### BATCH B — paralelo
+### BATCH B — parallel
 
-Dispare dois sub-agentes simultaneamente:
+Run two sub-agents in parallel:
 
-**Sub-agente 1 — Documentação**
-- Execute 3.2
-- Não altere `CLAUDE.md` se não houver setup ou orientação nova
-- Marque 3.2 `[x] completed` ou `[-] skipped` com justificativa
+**Sub-agent 1 — Documentation**
+- Run 3.2
+- Do not change `CLAUDE.md` unless there is new setup or guidance
+- Mark 3.2 `[x] completed` or `[-] skipped` with justification
 
-**Sub-agente 2 — Token report**
-- Execute 3.4
-- Leia `## Token Usage` das fases 1, 2 e 3
-- Marque 3.4 `[x] completed`
+**Sub-agent 2 — Token report**
+- Run 3.4
+- Read `## Token Usage` from phases 1, 2, and 3
+- Mark 3.4 `[x] completed`
 
-**Aguarde os dois** antes de avançar.
+**Wait for both** before continuing.
 
-### BATCH C — sequencial
+### BATCH C — sequential
 
-Execute **3.3**:
-- Mova a RFC de `rfcs/draft/` para `rfcs/completed/`
-- Atualize status, datas e Decision Record
-- Marque 3.3 `[x] completed`
+Run **3.3**:
+- Move the RFC from `rfcs/draft/` to `rfcs/completed/`
+- Update status, dates, and Decision Record
+- Mark 3.3 `[x] completed`
 
-### Finalização
-- Todos completos → atualize `Status da fase` para `[x] completed` com `Concluído em`
-- Algum bloqueio → atualize `Status da fase` para `[!] blocked` e registre em Blockers
+### Wrap-up
+- All done → set **Phase status** to `[x] completed` with **Completed at**
+- Any block → set **Phase status** to `[!] blocked` and record under Blockers
 
 ---
 
 ## Blockers
 
-_Nenhum. Pré-requisito fase 2 verificado: `fase-2-ux-validacao.md` encontra-se `[x] completed` (2026-04-26)._
+_None. Prerequisite phase 2 verified: `fase-2-ux-validacao.md` is `[x] completed` (2026-04-26)._
 
 ---
 
@@ -134,9 +134,9 @@ _Nenhum. Pré-requisito fase 2 verificado: `fase-2-ux-validacao.md` encontra-se 
 
 ## Token Usage
 
-| Campo | Valor |
+| Field | Value |
 |-------|-------|
-| Ferramenta | Cursor (agente) |
-| Tokens consumidos | 75,3k (≈75.3k) |
+| Tool | Cursor (agente) |
+| Tokens consumed | 75,3k (≈75.3k) |
 | Janela de contexto | 37,7% utilizada |
-| Observação | Fase 3 (documentação); ver também `tasks/rfc-0002/token-report.md`. |
+| Notes | Fase 3 (documentação); ver também `tasks/rfc-0002/token-report.md`. |

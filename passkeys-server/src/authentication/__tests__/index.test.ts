@@ -57,13 +57,13 @@ const mockAuthResponse: AuthenticationResponseJSON = {
 beforeEach(() => jest.clearAllMocks());
 
 describe('getAuthenticationOptions', () => {
-  it('usuário não encontrado → lança Error("User not found")', async () => {
+  it('user not found → throws Error("User not found")', async () => {
     mockGetUser.mockResolvedValue(null);
 
     await expect(getAuthenticationOptions('alice')).rejects.toThrow('User not found');
   });
 
-  it('usuário com credenciais → retorna opções com allowCredentials correto', async () => {
+  it('user with credentials → returns options with correct allowCredentials', async () => {
     mockGetUser.mockResolvedValue(mockUser);
     mockGenerateAuthenticationOptions.mockResolvedValue(mockAuthOptions as any);
     mockRedisSetex.mockResolvedValue('OK');
@@ -76,7 +76,7 @@ describe('getAuthenticationOptions', () => {
     ]);
   });
 
-  it('armazena challenge no Redis com TTL de 300 segundos', async () => {
+  it('stores challenge in Redis with 300s TTL', async () => {
     mockGetUser.mockResolvedValue(mockUser);
     mockGenerateAuthenticationOptions.mockResolvedValue(mockAuthOptions as any);
     mockRedisSetex.mockResolvedValue('OK');
@@ -92,13 +92,13 @@ describe('getAuthenticationOptions', () => {
 });
 
 describe('verifyAuthentication', () => {
-  it('usuário não encontrado → lança Error("User not found")', async () => {
+  it('user not found → throws Error("User not found")', async () => {
     mockGetUser.mockResolvedValue(null);
 
     await expect(verifyAuthentication('alice', mockAuthResponse)).rejects.toThrow('User not found');
   });
 
-  it('challenge expirado → lança Error("No challenge found or challenge expired")', async () => {
+  it('expired challenge → throws Error("No challenge found or challenge expired")', async () => {
     mockGetUser.mockResolvedValue(mockUser);
     mockRedisGet.mockResolvedValue(null);
 
@@ -107,7 +107,7 @@ describe('verifyAuthentication', () => {
     );
   });
 
-  it('credencial não registrada para o usuário → lança Error("Authenticator is not registered with this site")', async () => {
+  it('credential not registered for user → throws Error("Authenticator is not registered with this site")', async () => {
     mockGetUser.mockResolvedValue(mockUser);
     mockRedisGet.mockResolvedValue('auth-challenge');
 
@@ -122,7 +122,7 @@ describe('verifyAuthentication', () => {
     );
   });
 
-  it('verificação bem-sucedida → atualiza counter via updateUser', async () => {
+  it('successful verification → updates counter via updateUser', async () => {
     mockGetUser.mockResolvedValue({ ...mockUser, credentials: [{ ...mockCredential }] });
     mockRedisGet.mockResolvedValue('auth-challenge');
     mockVerifyAuthenticationResponse.mockResolvedValue({
@@ -145,7 +145,7 @@ describe('verifyAuthentication', () => {
     expect(mockUpdateUser).toHaveBeenCalled();
   });
 
-  it('verifyAuthenticationResponse lança exceção → relança o erro', async () => {
+  it('verifyAuthenticationResponse throws → rethrows', async () => {
     mockGetUser.mockResolvedValue(mockUser);
     mockRedisGet.mockResolvedValue('auth-challenge');
     mockVerifyAuthenticationResponse.mockRejectedValue(new Error('Auth verification failed'));

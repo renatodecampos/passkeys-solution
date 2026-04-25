@@ -1,259 +1,258 @@
 # AGENTS.md
 
-Convenções para agentes (Claude Code, Cursor, ou qualquer LLM) trabalhando neste repositório.
-Estas regras têm precedência sobre comportamentos padrão dos agentes.
+Conventions for agents (Claude Code, Cursor, or any LLM) working in this repository.
+These rules take precedence over default agent behavior.
 
 ---
 
-## 0. Como usar este harness
+## 0. How to use this harness
 
-### Executar uma fase existente
+### Run an existing phase
 
-Abra uma nova janela de contexto e use:
+Open a new context window and run:
 
 ```
-/feature-dev execute RFC-XXXX fase <identificador>
+/feature-dev execute RFC-XXXX phase <identifier>
 ```
 
-- `RFC-XXXX` é a iniciativa (ex: `RFC-0001`, `RFC-0002`)
-- A pasta de tasks é `tasks/rfc-xxxx/` (número da RFC em **minúsculas**)
-- `fase` usa o identificador do plano: `1`, `1b`, `2`, `3` … (cada RFC recomeça em 1)
+- `RFC-XXXX` is the initiative (e.g. `RFC-0001`, `RFC-0002`)
+- Task folder is `tasks/rfc-xxxx/` (RFC number in **lowercase**)
+- `phase` uses the plan identifier: `1`, `1b`, `2`, `3`, … (each RFC restarts at 1)
 
-O agente abre o arquivo `tasks/rfc-xxxx/fase-....md` correspondente, lê a seção **"Instruções para o
-Orquestrador"** e executa. Cada arquivo é autossuficiente.
+The agent opens the matching `tasks/rfc-xxxx/fase-....md` file, reads the **"Orchestrator instructions"** section, and executes. Each file is self-contained.
 
-| Comando | Arquivo lido |
-|---------|-------------|
-| `/feature-dev execute RFC-0001 fase 1` | `tasks/rfc-0001/fase-1-status.md` |
-| `/feature-dev execute RFC-0001 fase 1b` | `tasks/rfc-0001/fase-1b-testes-server.md` |
-| `/feature-dev execute RFC-0001 fase 2` | `tasks/rfc-0001/fase-2-status.md` |
-| `/feature-dev execute RFC-0001 fase 3` | `tasks/rfc-0001/fase-3-status.md` |
-| `/feature-dev execute RFC-0001 fase 4` | `tasks/rfc-0001/fase-4-documentacao.md` |
-| `/feature-dev execute RFC-0002 fase 1` | `tasks/rfc-0002/fase-1-ux-app.md` |
-| `/feature-dev execute RFC-0002 fase 2` | `tasks/rfc-0002/fase-2-ux-validacao.md` |
-| `/feature-dev execute RFC-0002 fase 3` | `tasks/rfc-0002/fase-3-documentacao.md` |
+| Command | File read |
+|---------|-----------|
+| `/feature-dev execute RFC-0001 phase 1` | `tasks/rfc-0001/fase-1-status.md` |
+| `/feature-dev execute RFC-0001 phase 1b` | `tasks/rfc-0001/fase-1b-testes-server.md` |
+| `/feature-dev execute RFC-0001 phase 2` | `tasks/rfc-0001/fase-2-status.md` |
+| `/feature-dev execute RFC-0001 phase 3` | `tasks/rfc-0001/fase-3-status.md` |
+| `/feature-dev execute RFC-0001 phase 4` | `tasks/rfc-0001/fase-4-documentacao.md` |
+| `/feature-dev execute RFC-0002 phase 1` | `tasks/rfc-0002/fase-1-ux-app.md` |
+| `/feature-dev execute RFC-0002 phase 2` | `tasks/rfc-0002/fase-2-ux-validacao.md` |
+| `/feature-dev execute RFC-0002 phase 3` | `tasks/rfc-0002/fase-3-documentacao.md` |
+
+> **Note:** On-disk filenames keep the `fase-` prefix; the slash command uses the English keyword `phase`.
 
 ---
 
-### Criar harness para uma nova RFC
+### Create a harness for a new RFC
 
-**Não recrie a infraestrutura.** `AGENTS.md`, `CLAUDE.md` e `tasks/README.md` são
-permanentes e compartilhados por todas as RFCs.
+**Do not recreate the shared infrastructure.** `AGENTS.md`, `CLAUDE.md`, and `tasks/README.md` are permanent and shared across all RFCs.
 
-Para uma nova RFC, use:
+For a new RFC, use:
 
 ```
-/feature-dev cria harness para a RFC-{{NUMERO}}
+/feature-dev create harness for RFC-{{NUMBER}}
 ```
 
-O agente deve:
+The agent must:
 
-1. **Criar a RFC** em `rfcs/draft/RFC-{{NUMERO}}-{{slug}}.md`
-   - Usar `rfcs/_template-rfc.md` como base
-   - Preencher todas as seções com o conteúdo da iniciativa
+1. **Create the RFC** at `rfcs/draft/RFC-{{NUMBER}}-{{slug}}.md`
+   - Use `rfcs/_template-rfc.md` as the base
+   - Fill all sections with the initiative content
 
-2. **Criar a pasta** `tasks/rfc-<NÚMERO-EM-MINÚSCULO>/` (ex: `tasks/rfc-0003/`)
+2. **Create the folder** `tasks/rfc-<NUMBER-IN-LOWERCASE>/` (e.g. `tasks/rfc-0003/`)
 
-3. **Criar os arquivos de fase** nessa pasta
-   - Um arquivo por fase definida na RFC
-   - Usar `tasks/_template-fase.md` como base para cada um
-   - Nomenclatura: `fase-<número>-<slug>.md` (fases numéricas recomeçam em **1** para cada RFC)
-   - Preencher subtarefas, parallelism map e instruções do orquestrador
-   - Referências cruzadas e pré-condições usam caminhos `tasks/rfc-XXXX/...`
+3. **Create the phase files** in that folder
+   - One file per phase defined in the RFC
+   - Use `tasks/_template-fase.md` as the base for each
+   - Naming: `fase-<number>-<slug>.md` (numeric phases restart at **1** for each RFC)
+   - Fill subtasks, parallelism map, and orchestrator instructions
+   - Cross-references and preconditions use paths `tasks/rfc-XXXX/...`
 
-4. **Atualizar `tasks/README.md`**
-   - Adicionar seção com tabela da nova RFC e caminhos dos arquivos
+4. **Update `tasks/README.md`**
+   - Add a section with a table for the new RFC and file paths
 
-5. **Atualizar a tabela de comandos** na seção 0 deste arquivo (`AGENTS.md`)
-   - Adicionar linhas `/feature-dev execute RFC-XXXX fase Y → tasks/rfc-xxxx/fase-....md`
+5. **Update the command table** in section 0 of this file (`AGENTS.md`)
+   - Add rows `/feature-dev execute RFC-XXXX phase Y → tasks/rfc-xxxx/fase-....md`
 
-**O que NÃO fazer ao criar harness:**
-- Não modifique fases de outras RFCs sem coordenação
-- Não altere `CLAUDE.md` (exceto na fase de documentação, quando a RFC assim definir)
-- Não mova ou renomeie pastas `tasks/rfc-xxxx/` concluídas sem atualizar **todas** as referências (AGENTS, README, fases, RFCs)
+**Do not when creating a harness:**
+- Do not modify other RFCs’ phases without coordination
+- Do not change `CLAUDE.md` (except in the documentation phase, if the RFC says so)
+- Do not move or rename completed `tasks/rfc-xxxx/` folders without updating **all** references (AGENTS, README, phases, RFCs)
 
 ---
 
-## 1. Leitura obrigatória antes de qualquer tarefa
+## 1. Required reading before any task
 
-Antes de escrever qualquer linha de código, leia:
+Before writing any code, read:
 
-1. `CLAUDE.md` — visão geral do projeto, comandos e arquitetura
-2. O arquivo de status da fase em que você está trabalhando (`tasks/rfc-XXXX/...md`)
-3. A RFC do plano em `rfcs/draft/` ou `rfcs/completed/` (conforme a iniciativa ativa)
-
----
-
-## 2. Regras de atualização de status
-
-Todo agente **deve** atualizar o arquivo de status da sua fase antes de começar e ao concluir cada subtarefa.
-
-### Formato de status
-
-```
-[ ] pending      — ainda não iniciado
-[~] in_progress  — em andamento (inclua timestamp ISO e qual agente)
-[x] completed    — concluído e verificado
-[!] blocked      — bloqueado (descreva o motivo na linha abaixo)
-[-] skipped      — ignorado com justificativa
-```
-
-### Regra de bloqueio
-
-Se uma subtarefa estiver bloqueada:
-1. Marque `[!] blocked` com descrição do motivo
-2. NÃO avance para subtarefas dependentes
-3. NÃO tente contornar o bloqueio silenciosamente
-4. Registre a dependência no campo `## Blockers` do arquivo de status
-
-### Regra de conclusão de fase
-
-Uma fase só está completa quando **todos os critérios de conclusão** listados no arquivo de status estiverem verificados. Não marque a fase como completa antes disso.
-
-### Verificação de pré-condição no disco
-
-Antes de declarar uma fase bloqueada por pré-condição, **leia o arquivo de fase anterior no disco** e confirme o status real. O arquivo pode estar `[x] completed` mesmo que o orquestrador não tenha recebido a confirmação explícita (lição RFC-0002 fase 3).
+1. `CLAUDE.md` — project overview, commands, architecture
+2. The status file for the phase you are working on (`tasks/rfc-XXXX/...md`)
+3. The plan RFC in `rfcs/draft/` or `rfcs/completed/` (per the active initiative)
 
 ---
 
-## 3. Arquitetura do projeto — regras para o server
+## 2. Status update rules
 
-Diretório: `passkeys-server/src/`
+Every agent **must** update their phase status file before starting and after completing each subtask.
 
-### Camadas (respeite a separação)
+### Status format
 
 ```
-infra/api/index.ts        ← apenas rotas Fastify e middleware
-registration/index.ts     ← apenas lógica WebAuthn de registro
-authentication/index.ts   ← apenas lógica WebAuthn de autenticação
-infra/database/           ← apenas acesso a dados (MongoDB, Redis)
-setup/index.ts            ← apenas leitura de variáveis de ambiente
+[ ] pending      — not started
+[~] in_progress  — in progress (include ISO timestamp and which agent)
+[x] completed    — done and verified
+[!] blocked      — blocked (describe why on the line below)
+[-] skipped      — skipped with justification
 ```
 
-**Proibido**: importar `database.ts` diretamente em `api/index.ts`. Rotas chamam apenas módulos de `registration/` ou `authentication/`.
+### Blocking rule
 
-**Proibido**: colocar lógica de negócio em `infra/api/index.ts`. Rotas são thin controllers.
+If a subtask is blocked:
+1. Mark `[!] blocked` with a reason
+2. Do **not** advance to dependent subtasks
+3. Do **not** silently work around the block
+4. Record the dependency in the `## Blockers` section of the status file
+
+### Phase completion rule
+
+A phase is complete only when **all completion criteria** listed in the status file are verified. Do not mark the phase complete before that.
+
+### On-disk precondition check
+
+Before declaring a phase blocked on a precondition, **read the previous phase file on disk** and confirm the real status. It may already be `[x] completed` even if the orchestrator did not get explicit confirmation (lesson: RFC-0002 phase 3).
+
+---
+
+## 3. Project architecture — server rules
+
+Directory: `passkeys-server/src/`
+
+### Layers (keep separation)
+
+```
+infra/api/index.ts        ← Fastify routes and middleware only
+registration/index.ts     ← WebAuthn registration logic only
+authentication/index.ts   ← WebAuthn authentication logic only
+infra/database/           ← data access only (MongoDB, Redis)
+setup/index.ts            ← environment variables only
+```
+
+**Forbidden:** import `database.ts` directly from `api/index.ts`. Routes call only `registration/` or `authentication/` modules.
+
+**Forbidden:** put business logic in `infra/api/index.ts`. Routes are thin controllers.
 
 ### TypeScript
 
-- `strict: true` está ativo — não use `any` sem justificativa explícita em comentário
-- Não use `console.log` — use `logger` de `infra/logger.ts`
-- Variáveis de ambiente: sempre leia de `setup/index.ts`, nunca de `process.env` diretamente nos módulos
+- `strict: true` is on — do not use `any` without an explicit comment justification
+- Do not use `console.log` — use `logger` from `infra/logger.ts`
+- Environment variables: always read from `setup/index.ts`, never from `process.env` directly in modules
 
 ---
 
-## 4. Arquitetura do projeto — regras para o app
+## 4. Project architecture — app rules
 
-Diretório: `passkeys-app/`
+Directory: `passkeys-app/`
 
-### Estrutura esperada ao final
+### Expected end state
 
 ```
 app/
-├── index.tsx             ← tela de login/registro (entrada pública — Calm Card)
-├── home.tsx              ← tela autenticada (Home Proof); NÃO use app/(tabs)/index.tsx
+├── index.tsx             ← login/register screen (public entry — Calm Card)
+├── home.tsx              ← authenticated screen (Home Proof); do NOT use app/(tabs)/index.tsx
 ├── (tabs)/
-│   └── index.tsx         ← tabs genéricas (explore etc.); fora do fluxo passkey
-└── _layout.tsx           ← layout raiz (não modificar sem necessidade)
+│   └── index.tsx         ← generic tabs (explore etc.); outside passkey flow
+└── _layout.tsx           ← root layout (change only if needed)
 
 services/
-└── api.ts                ← único arquivo de chamadas HTTP ao server
+└── api.ts                ← only file for HTTP calls to the server
 
 ```
 
-**Proibido**: fazer `fetch` diretamente em componentes de tela. Todas as chamadas HTTP passam por `services/api.ts`.
+**Forbidden:** call `fetch` directly from screen components. All HTTP goes through `services/api.ts`.
 
-**Proibido**: importar `react-native-passkey` fora de `app/index.tsx`. A lógica de passkey fica concentrada na tela de entrada.
+**Forbidden:** import `react-native-passkey` outside `app/index.tsx`. Passkey logic stays on the entry screen.
 
-**Proibido**: usar `app/(tabs)/index.tsx` como destino de navegação pós-login. O fluxo de passkey usa `app/index.tsx` → `app/home.tsx`. Misturar com a navegação por tabs gera ambiguidade de rota e blocker de logout (lição RFC-0001 fase 3).
+**Forbidden:** use `app/(tabs)/index.tsx` as the post-login navigation target. The passkey flow uses `app/index.tsx` → `app/home.tsx`. Mixing with tab navigation causes route ambiguity and logout blockers (lesson: RFC-0001 phase 3).
 
 ### Expo
 
-- O projeto usa `expo-dev-client` — não use Expo Go para testar módulos nativos
-- Antes de rodar `expo prebuild`, confirme que `sdkVersion` em `app.json` está alinhado com a versão do Expo SDK instalada (ex: `"53.0.0"` para SDK 53). Divergência causa falha de Gradle.
-- Após instalar qualquer dependência nativa: `npx expo prebuild --platform android --clean`
-- Caminho de alias `@/` está configurado — use-o em vez de caminhos relativos
+- This project uses `expo-dev-client` — do not use Expo Go for native modules
+- Before `expo prebuild`, confirm `sdkVersion` in `app.json` matches the installed Expo SDK (e.g. `"53.0.0"` for SDK 53). Mismatch causes Gradle failure.
+- After any native dependency: `npx expo prebuild --platform android --clean`
+- The `@/` path alias is configured — prefer it over relative paths
 
 ---
 
-## 5. Regras de paralelismo entre agentes
+## 5. Parallelism between agents
 
-Dentro de cada fase, algumas subtarefas são independentes e podem ser executadas em paralelo.
-O arquivo de status de cada fase indica quais subtarefas têm dependência entre si.
+Within a phase, some subtasks are independent and can run in parallel. Each phase’s status file shows which subtasks depend on others.
 
-**Regra geral**:
-- Subtarefas com `depends_on: []` podem rodar em paralelo
-- Subtarefas com `depends_on: [X.Y]` só começam depois que X.Y está `[x] completed`
-- O agente orquestrador lê os status antes de disparar sub-agentes
-
----
-
-## 6. Regras de teste
-
-- Verifique o critério de conclusão da fase **com um comando real** antes de marcar como completa
-- Os critérios de conclusão estão definidos em cada `tasks/rfc-XXXX/fase-....md` da RFC em execução
-- Se o critério de conclusão falhar, marque a subtarefa relevante como `[!] blocked`
-
-### Jest — flags e versão
-
-- Jest v29+ renomeou `--testPathPattern` (singular) para `--testPathPatterns` (plural). Sempre use a forma plural ao fixar comandos na spec de uma fase.
-- Para verificar a versão instalada: `npx jest --version`
-
-### Testes de serviços HTTP (`services/api.ts`)
-
-- Testes de funções que fazem `fetch` devem validar **o que é enviado** (body, headers) — não apenas mockar a resposta. Mockar só a resposta deixa bugs de body vazio ou header faltando invisíveis até a integração (lição RFC-0001 fase 3).
-- Use `expect(fetchMock).toHaveBeenCalledWith(url, expect.objectContaining({ body: ... }))` ou equivalente.
+**General rule:**
+- Subtasks with `depends_on: []` may run in parallel
+- Subtasks with `depends_on: [X.Y]` start only after X.Y is `[x] completed`
+- The orchestrator agent reads status before launching sub-agents
 
 ---
 
-## 7. O que NÃO fazer
+## 6. Testing rules
 
-- Não refatore código que não faz parte da tarefa atual
-- Não adicione dependências que não estejam especificadas na RFC ou no arquivo de status
-- Não modifique `CLAUDE.md` ou `AGENTS.md` durante a execução de uma fase
-- Não delete arquivos sem listar o motivo no arquivo de status
-- Não avance de fase sem que o critério de conclusão da fase anterior esteja verificado
+- Verify the phase completion criterion **with a real command** before marking complete
+- Completion criteria are defined in each `tasks/rfc-XXXX/fase-....md` for the active RFC
+- If the completion criterion fails, mark the relevant subtask `[!] blocked`
+
+### Jest — flags and version
+
+- Jest v29+ renamed `--testPathPattern` (singular) to `--testPathPatterns` (plural). Always use the plural form when fixing commands in a phase spec.
+- Check installed version: `npx jest --version`
+
+### HTTP service tests (`services/api.ts`)
+
+- Tests for functions that use `fetch` must validate **what is sent** (body, headers) — not only mock the response. Mocking the response only hides empty-body or missing-header bugs until integration (lesson: RFC-0001 phase 3).
+- Use `expect(fetchMock).toHaveBeenCalledWith(url, expect.objectContaining({ body: ... }))` or equivalent.
 
 ---
 
-## 8. Feedback Forward — loop de melhoria contínua do harness
+## 7. What not to do
 
-### O que é
+- Do not refactor code outside the current task
+- Do not add dependencies not specified in the RFC or status file
+- Do not modify `CLAUDE.md` or `AGENTS.md` while executing a phase
+- Do not delete files without recording the reason in the status file
+- Do not advance a phase without the previous phase’s completion criterion verified
 
-Ao concluir cada fase, o agente orquestrador **deve** avaliar o que aprendeu durante a execução e registrar isso em dois lugares:
+---
 
-1. Na seção `## Feedback Forward` do arquivo de fase concluída
-2. Em `tasks/feedback-forward.md` (acumulador cross-RFC)
+## 8. Feedback Forward — continuous harness improvement
 
-Esses registros alimentam a fase de Documentação de cada RFC, que aplica as melhorias nos arquivos permanentes do harness (`AGENTS.md`, `CLAUDE.md`, `_template-fase.md`).
+### What it is
 
-### Quando preencher
+When each phase ends, the orchestrator agent **must** capture what was learned and record it in two places:
 
-Imediatamente antes de atualizar `Status da fase` para `[x] completed`. Não é opcional.
+1. The `## Feedback Forward` section of the completed phase file
+2. `tasks/feedback-forward.md` (cross-RFC log)
 
-### O que capturar
+These feed each RFC’s Documentation phase, which applies improvements to permanent harness files (`AGENTS.md`, `CLAUDE.md`, `_template-fase.md`).
 
-| Categoria | Exemplos |
+### When to fill
+
+Immediately before updating **Phase status** to `[x] completed`. Not optional.
+
+### What to capture
+
+| Category | Examples |
 |-----------|---------|
-| **Spec incorreta** | Caminho de arquivo errado, nome de variável desatualizado, flag de CLI que mudou de versão |
-| **Gap de pré-condição** | Dependência de hardware não marcada, pré-requisito de ambiente não documentado |
-| **Gap de teste** | Comportamento não coberto pelos testes unitários que apareceu na integração |
-| **Decisão de arquitetura** | Estrutura de rota, local de lógica, separação de responsabilidades que não estava na spec |
-| **Retrabalho evitável** | Qualquer coisa que, se estivesse na spec, teria poupado tempo |
+| **Wrong spec** | Wrong file path, outdated variable name, CLI flag that changed between versions |
+| **Precondition gap** | Unmarked hardware dependency, undocumented environment prerequisite |
+| **Test gap** | Behavior not covered by unit tests that showed up in integration |
+| **Architecture decision** | Route structure, logic placement, separation not in the spec |
+| **Avoidable rework** | Anything that, if in the spec, would have saved time |
 
-### Sinal de alerta
+### Alert signal
 
-Uma fase com **3 ou mais blockers resolvidos** indica que a spec das fases anteriores tinha gaps significativos. Nesse caso, o agente deve:
-1. Preencher `## Feedback Forward` com foco nos gaps da spec anterior
-2. Adicionar em `tasks/feedback-forward.md` uma entrada em "Insights transversais" se o padrão for recorrente
-3. Sugerir atualização explícita de `_template-fase.md` para evitar o mesmo gap em futuras RFCs
+A phase with **3 or more resolved blockers** suggests earlier phase specs had major gaps. Then the agent should:
+1. Fill `## Feedback Forward` focused on the previous spec’s gaps
+2. Add an entry under “Cross-cutting insights” in `tasks/feedback-forward.md` if the pattern recurs
+3. Suggest an explicit `_template-fase.md` update to avoid the same gap in future RFCs
 
-### Processo de aplicação (fase de Documentação)
+### Application process (documentation phase)
 
-O agente da fase de Documentação de cada RFC deve:
-1. Ler `tasks/feedback-forward.md` inteiro
-2. Aplicar todas as linhas com `Aplicado? [ ]` que forem de alta prioridade
-3. Marcar as linhas aplicadas como `[x]` com referência ao commit ou PR
-4. Atualizar `tasks/README.md` se novos arquivos de harness forem criados
+The Documentation phase agent for each RFC must:
+1. Read `tasks/feedback-forward.md` in full
+2. Apply all lines with `Applied? [ ]` that are high priority
+3. Mark applied lines `[x]` with commit or PR reference
+4. Update `tasks/README.md` if new harness files are created
 
 ---

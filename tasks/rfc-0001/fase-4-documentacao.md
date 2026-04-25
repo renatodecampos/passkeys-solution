@@ -1,19 +1,19 @@
-# Fase 4 — Documentação
+# Phase 4 — Documentation
 
-**Status da fase**: `[x] completed`
-**Agente responsável**: Cursor Agent (Sonnet 4.6)
-**Iniciado em**: 2026-04-24T16:00:00Z
-**Concluído em**: 2026-04-24T16:30:00Z
+**Phase status**: `[x] completed`
+**Owning agent**: Cursor Agent (Sonnet 4.6)
+**Started at**: 2026-04-24T16:00:00Z
+**Completed at**: 2026-04-24T16:30:00Z
 
 ---
 
-## Pré-requisito
+## Prerequisite
 
 Fase 3 deve estar `[x] completed`.
 
 ---
 
-## Critério de conclusão
+## Completion criterion
 
 `CLAUDE.md` reflete o estado real do projeto — um novo desenvolvedor consegue subir
 o ambiente completo (server + emulador + app) seguindo apenas esse arquivo, sem consultar
@@ -39,24 +39,24 @@ O que não entra:
 
 ---
 
-## Subtarefas
+## Subtasks
 
 ### 4.1 — Revisar o que mudou em cada fase
 - **Status**: `[x] completed`
 - **depends_on**: []
-- **O que fazer**: Leia os campos `## Notas` de cada arquivo de status:
+- **What to do**: Leia os campos `## Notas` de cada arquivo de status:
   - `tasks/rfc-0001/fase-1-status.md`
   - `tasks/rfc-0001/fase-1b-testes-server.md`
   - `tasks/rfc-0001/fase-2-status.md`
   - `tasks/rfc-0001/fase-3-status.md`
   Liste o que é relevante documentar no campo Notas deste arquivo antes de avançar.
-- **Verificação**: Campo Notas preenchido com a lista de itens a documentar
+- **Verification**: Campo Notas preenchido com a lista de itens a documentar
 
 ### 4.2 — Atualizar CLAUDE.md
 - **Status**: `[x] completed`
 - **depends_on**: [4.1]
-- **Arquivo**: `CLAUDE.md`
-- **O que fazer**: Adicionar ou atualizar as seções abaixo com base no que foi levantado em 4.1:
+- **File**: `CLAUDE.md`
+- **What to do**: Adicionar ou atualizar as seções abaixo com base no que foi levantado em 4.1:
 
   **Setup do ambiente (novo dev)**
   - Pré-requisitos: Node, Docker, mkcert, Android Studio + emulador API 34+
@@ -83,25 +83,25 @@ O que não entra:
     → Settings → Security → Install from storage → rootCA.pem
   - Configurar biometria virtual: Settings → Security → Fingerprint
 
-- **Verificação**: `CLAUDE.md` atualizado sem duplicar informações já presentes
+- **Verification**: `CLAUDE.md` atualizado sem duplicar informações já presentes
 
 ### 4.3 — Atualizar README do server
 - **Status**: `[x] completed`
 - **depends_on**: [4.1]
-- **Arquivo**: `passkeys-server/README.md`
-- **O que fazer**: Atualizar apenas as seções que ficaram desatualizadas:
+- **File**: `passkeys-server/README.md`
+- **What to do**: Atualizar apenas as seções que ficaram desatualizadas:
   - Seção "Prerequisites": adicionar mkcert
   - Seção "Installation": adicionar passo de geração de certificados
   - Seção "Environment Variables": corrigir nomes das variáveis para refletir `setup/index.ts`
     (`REDIS_URL` em vez de `REDIS_HOST`/`REDIS_PORT`, `DB_NAME` em vez de `MONGODB_DATABASE`)
   - Remover menção a `npm test` como placeholder — agora funciona
-- **Verificação**: README não menciona variáveis que não existem em `setup/index.ts`
+- **Verification**: README não menciona variáveis que não existem em `setup/index.ts`
 
 ### 4.5 — Gerar token-report.md
 - **Status**: `[x] completed`
 - **depends_on**: [4.1]
-- **Arquivo**: `tasks/rfc-0001/token-report.md` (criar)
-- **O que fazer**:
+- **File**: `tasks/rfc-0001/token-report.md` (criar)
+- **What to do**:
   1. Leia a seção `## Token Usage` de cada arquivo de status:
      - `tasks/rfc-0001/fase-1-status.md`
      - `tasks/rfc-0001/fase-1b-testes-server.md`
@@ -118,7 +118,7 @@ O que não entra:
   **Gerado em**: YYYY-MM-DD
   **Ferramenta principal**: Cursor (Sonnet 4.6)
 
-  | Fase | Descrição                  | Tokens consumidos |
+  | Fase | Descrição                  | Tokens consumed |
   |------|----------------------------|-------------------|
   | 1    | Infra + HTTPS              | X                 |
   | 1b   | Testes unitários server    | X                 |
@@ -130,18 +130,18 @@ O que não entra:
   ## Observações
   - ...
   ```
-- **Verificação**: arquivo `tasks/rfc-0001/token-report.md` criado com todas as fases preenchidas
+- **Verification**: arquivo `tasks/rfc-0001/token-report.md` criado com todas as fases preenchidas
 
 ### 4.4 — Atualizar RFC para IN_PROGRESS → COMPLETED
 - **Status**: `[x] completed`
 - **depends_on**: [4.2, 4.3]
-- **Arquivo**: `rfcs/draft/RFC-0001-passkeys-poc-completion.md`
-- **O que fazer**:
+- **File**: `rfcs/draft/RFC-0001-passkeys-poc-completion.md`
+- **What to do**:
   - Mover o arquivo para `rfcs/completed/`
   - Atualizar `status: COMPLETED`
   - Atualizar `decision_date` com a data atual
   - Preencher `## Decision Record` com: decisão tomada, data, principais pontos (ex: mkcert + adb reverse funcionou conforme esperado, `react-native-passkey` compatível com Expo SDK 53)
-- **Verificação**: Arquivo em `rfcs/completed/`, status `COMPLETED`
+- **Verification**: Arquivo em `rfcs/completed/`, status `COMPLETED`
 
 ---
 
@@ -157,59 +157,59 @@ O que não entra:
 
 ---
 
-## Instruções para o Orquestrador
+## Orchestrator instructions
 
-> Estas instruções são lidas automaticamente quando você executa `/feature-dev execute RFC-0001 fase 4`
+> These instructions apply when you run `/feature-dev execute RFC-0001 phase 4`
 
-**Pré-condição**: verifique que `tasks/rfc-0001/fase-3-status.md` está `[x] completed`. Se não estiver, pare e informe.
+**Precondition:** confirm `tasks/rfc-0001/fase-3-status.md` is `[x] completed`. If not, stop and report.
 
-**Ao iniciar**: atualize o cabeçalho deste arquivo — `Status da fase` para `[~] in_progress`, `Agente responsável` com seu nome, `Iniciado em` com timestamp ISO.
+**On start:** update this file’s header — set **Phase status** to `[~] in_progress`, **Owning agent** to your name, **Started at** to an ISO timestamp.
 
-### BATCH A — sequencial
+### BATCH A — sequential
 Execute **4.1**:
 - Leia o campo `## Notas` de cada arquivo de status das fases anteriores
 - Consolide no campo Notas deste arquivo o que é relevante documentar
-- Marque 4.1 `[x] completed`
+- Mark 4.1 `[x] completed`
 
-### BATCH B — paralelo
+### BATCH B — parallel
 Dispare três sub-agentes **simultaneamente**:
 
-**Sub-agente 1 — CLAUDE.md**
+**Sub-agent 1 — CLAUDE.md**
 - Leia `CLAUDE.md` atual na íntegra
 - Atualize conforme spec da subtarefa 4.2
 - Não duplique informações já presentes
-- Marque 4.2 `[x] completed`
+- Mark 4.2 `[x] completed`
 
-**Sub-agente 2 — README do server**
+**Sub-agent 2 — README do server**
 - Leia `passkeys-server/README.md` atual na íntegra
 - Leia `passkeys-server/src/setup/index.ts` para confirmar nomes das variáveis
 - Atualize conforme spec da subtarefa 4.3
-- Marque 4.3 `[x] completed`
+- Mark 4.3 `[x] completed`
 
 **Sub-agente 3 — token-report.md**
 - Leia a seção `## Token Usage` de cada arquivo de status das fases 1, 1b, 2, 3 e 4
 - Preencha o valor da fase 4 neste arquivo antes de consolidar
 - Crie `tasks/rfc-0001/token-report.md` conforme spec da subtarefa 4.5
-- Marque 4.5 `[x] completed`
+- Mark 4.5 `[x] completed`
 
 **Aguarde os três** antes de avançar.
 
-### BATCH C — sequencial
+### BATCH C — sequential
 Execute **4.4**:
 - Crie o diretório `rfcs/completed/` se não existir
 - Mova `rfcs/draft/RFC-0001-passkeys-poc-completion.md` para `rfcs/completed/`
 - Atualize status e preencha Decision Record
-- Marque 4.4 `[x] completed`
+- Mark 4.4 `[x] completed`
 
-### Finalização
-- Todos completos → atualize `Status da fase` para `[x] completed` com `Concluído em`
-- Algum bloqueio → atualize `Status da fase` para `[!] blocked` e registre em Blockers
+### Wrap-up
+- All done → set **Phase status** to `[x] completed` with **Completed at**
+- Any block → set **Phase status** to `[!] blocked` and record under Blockers
 
 ---
 
 ## Blockers
 
-_Nenhum bloqueio registrado._
+_No blockers recorded._
 
 ---
 

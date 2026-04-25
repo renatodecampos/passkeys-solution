@@ -228,7 +228,7 @@ This project was built entirely by AI agents coordinated through a **file-based 
 - [`AGENTS.md`](AGENTS.md) — architecture rules and agent conventions
 - [`CLAUDE.md`](CLAUDE.md) — onboarding for any new agent (or developer)
 - [`rfcs/completed/RFC-0001`](rfcs/completed/RFC-0001-passkeys-poc-completion.md) — base PoC specification
-- [`rfcs/completed/RFC-0002`](rfcs/completed/RFC-0002-ux-passkeys-poc.md) — Android UX evolution (concluída)
+- [`rfcs/completed/RFC-0002`](rfcs/completed/RFC-0002-ux-passkeys-poc.md) — Android UX evolution (completed)
 - [`tasks/`](tasks/README.md) — phase execution status
 
 **[Read the full presentation →](docs/harness-presentation.md)**
@@ -251,9 +251,9 @@ This project was built entirely by AI agents coordinated through a **file-based 
 
 | Phase | Description | Status |
 |---|---|---|
-| 1 | UX do app (Calm Card, Home Proof) | ✅ completed |
-| 2 | Validação UX e E2E | ✅ completed |
-| 3 | Documentação + RFC em `rfcs/completed/` | ✅ completed |
+| 1 | App UX (Calm Card, Home Proof) | ✅ completed |
+| 2 | UX validation and E2E | ✅ completed |
+| 3 | Documentation + RFC in `rfcs/completed/` | ✅ completed |
 
 ---
 

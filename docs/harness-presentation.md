@@ -120,7 +120,7 @@
 
 → [`AGENTS.md`](../AGENTS.md)
 
-- **§0** How to execute a phase → `/feature-dev execute RFC-XXXX fase Y`
+- **§0** How to execute a phase → `/feature-dev execute RFC-XXXX phase Y`
 - **§0** How to scaffold a new RFC → `/feature-dev create harness for RFC-XXXX`
 - **§3** Architecture rules — layers, forbidden imports
 - **§5** Parallelism rules — who runs together, who waits

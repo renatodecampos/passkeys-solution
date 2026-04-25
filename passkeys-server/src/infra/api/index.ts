@@ -23,7 +23,7 @@ const generateSessionKey = () => {
     return crypto.randomBytes(32).toString('hex');
 };
 
-/** Erros esperados do domínio WebAuthn (cliente) — não são falha do servidor */
+/** Expected WebAuthn domain errors (client) — not a server failure */
 const httpStatusForAuthDomainError = (err: Error): number => {
     return err.message === 'User not found' ? 400 : 500;
 };

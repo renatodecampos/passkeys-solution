@@ -51,7 +51,7 @@ const mockRegistrationOptions = {
 beforeEach(() => jest.clearAllMocks());
 
 describe('getRegistrationOptions', () => {
-  it('retorna opções para usuário existente sem criar novo usuário', async () => {
+  it('returns options for existing user without creating a new user', async () => {
     mockGetUser.mockResolvedValue(mockUser);
     mockGenerateRegistrationOptions.mockResolvedValue(mockRegistrationOptions as any);
     mockRedisSetex.mockResolvedValue('OK');
@@ -63,7 +63,7 @@ describe('getRegistrationOptions', () => {
     expect(mockGenerateRegistrationOptions).toHaveBeenCalled();
   });
 
-  it('usuário inexistente → cria usuário via createUser, depois retorna opções', async () => {
+  it('missing user → creates user via createUser, then returns options', async () => {
     mockGetUser
       .mockResolvedValueOnce(null)
       .mockResolvedValueOnce(mockUser);
@@ -82,7 +82,7 @@ describe('getRegistrationOptions', () => {
     expect(mockGetUser).toHaveBeenCalledTimes(2);
   });
 
-  it('armazena o challenge no Redis com TTL de 300 segundos', async () => {
+  it('stores challenge in Redis with 300s TTL', async () => {
     mockGetUser.mockResolvedValue(mockUser);
     mockGenerateRegistrationOptions.mockResolvedValue(mockRegistrationOptions as any);
     mockRedisSetex.mockResolvedValue('OK');
@@ -96,7 +96,7 @@ describe('getRegistrationOptions', () => {
     );
   });
 
-  it('exclui credenciais existentes via excludeCredentials', async () => {
+  it('excludes existing credentials via excludeCredentials', async () => {
     const userWithCreds = { ...mockUser, credentials: [mockCredential] };
     mockGetUser.mockResolvedValue(userWithCreds);
     mockGenerateRegistrationOptions.mockResolvedValue(mockRegistrationOptions as any);
@@ -124,13 +124,13 @@ describe('verifyRegistration', () => {
     clientExtensionResults: {},
   };
 
-  it('usuário não encontrado → lança Error("User not found")', async () => {
+  it('user not found → throws Error("User not found")', async () => {
     mockGetUser.mockResolvedValue(null);
 
     await expect(verifyRegistration('alice', mockResponse)).rejects.toThrow('User not found');
   });
 
-  it('challenge expirado (Redis retorna null) → lança Error("No challenge found or challenge expired")', async () => {
+  it('expired challenge (Redis returns null) → throws Error("No challenge found or challenge expired")', async () => {
     mockGetUser.mockResolvedValue(mockUser);
     mockRedisGet.mockResolvedValue(null);
 
@@ -139,7 +139,7 @@ describe('verifyRegistration', () => {
     );
   });
 
-  it('verificação bem-sucedida com credencial nova → adiciona à lista e chama updateUser', async () => {
+  it('successful verification with new credential → appends to list and calls updateUser', async () => {
     mockGetUser.mockResolvedValue({ ...mockUser, credentials: [] });
     mockRedisGet.mockResolvedValue('mock-challenge');
     mockVerifyRegistrationResponse.mockResolvedValue({
@@ -160,7 +160,7 @@ describe('verifyRegistration', () => {
     expect(mockUpdateUser).toHaveBeenCalled();
   });
 
-  it('verificação bem-sucedida com credencial já existente → não duplica, não chama updateUser', async () => {
+  it('successful verification with existing credential → no duplicate, no updateUser', async () => {
     const userWithCred = { ...mockUser, credentials: [{ ...mockCredential, id: 'cred-id-1' }] };
     mockGetUser.mockResolvedValue(userWithCred);
     mockRedisGet.mockResolvedValue('mock-challenge');
@@ -181,7 +181,7 @@ describe('verifyRegistration', () => {
     expect(mockUpdateUser).not.toHaveBeenCalled();
   });
 
-  it('verifyRegistrationResponse lança exceção → relança o erro', async () => {
+  it('verifyRegistrationResponse throws → rethrows', async () => {
     mockGetUser.mockResolvedValue(mockUser);
     mockRedisGet.mockResolvedValue('mock-challenge');
     mockVerifyRegistrationResponse.mockRejectedValue(new Error('Verification failed'));

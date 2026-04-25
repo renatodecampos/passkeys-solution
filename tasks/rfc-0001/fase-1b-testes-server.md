@@ -1,19 +1,19 @@
-# Fase 1b — Testes Unitários do Server
+# Phase 1b — Server unit tests
 
-**Status da fase**: `[x] completed`
-**Agente responsável**: Cursor Agent (Sonnet 4.6)
-**Iniciado em**: 2026-04-24T10:00:00Z
-**Concluído em**: 2026-04-24T10:20:00Z
+**Phase status**: `[x] completed`
+**Owning agent**: Cursor Agent (Sonnet 4.6)
+**Started at**: 2026-04-24T10:00:00Z
+**Completed at**: 2026-04-24T10:20:00Z
 
 ---
 
-## Pré-requisito
+## Prerequisite
 
 Fase 1 deve estar `[x] completed`.
 
 ---
 
-## Critério de conclusão
+## Completion criterion
 
 ```bash
 cd passkeys-server && npm test
@@ -33,13 +33,13 @@ Ambos têm dependências externas mockáveis: MongoDB (`infra/database/database`
 
 ---
 
-## Subtarefas
+## Subtasks
 
 ### 1b.1 — Setup de Jest + ts-jest
 - **Status**: `[x] completed`
 - **depends_on**: []
 - **Arquivos**: `passkeys-server/package.json`, `passkeys-server/jest.config.ts`
-- **O que fazer**:
+- **What to do**:
   1. Instalar dependências:
      ```bash
      cd passkeys-server
@@ -76,12 +76,12 @@ Ambos têm dependências externas mockáveis: MongoDB (`infra/database/database`
      "test": "jest --coverage",
      "test:watch": "jest --watch"
      ```
-- **Verificação**: `npm test` executa sem erro (zero testes ainda — só a infra)
+- **Verification**: `npm test` executa sem erro (zero testes ainda — só a infra)
 
 ### 1b.2 — Testes de registration
 - **Status**: `[x] completed`
 - **depends_on**: [1b.1]
-- **Arquivo**: `passkeys-server/src/registration/__tests__/index.test.ts`
+- **File**: `passkeys-server/src/registration/__tests__/index.test.ts`
 - **Mocks necessários**:
   - `../../infra/database/database` → `getUser`, `createUser`, `updateUser`
   - `../../infra/database/redis` → `redis.setex`, `redis.get`
@@ -101,12 +101,12 @@ Ambos têm dependências externas mockáveis: MongoDB (`infra/database/database`
   4. Verificação bem-sucedida com credencial já existente → não duplica, não chama `updateUser`
   5. `verifyRegistrationResponse` lança exceção → relança o erro
 
-- **Verificação**: `npm test -- --testPathPattern=registration` — todos os casos passam
+- **Verification**: `npm test -- --testPathPattern=registration` — todos os casos passam
 
 ### 1b.3 — Testes de authentication
 - **Status**: `[x] completed`
 - **depends_on**: [1b.1]
-- **Arquivo**: `passkeys-server/src/authentication/__tests__/index.test.ts`
+- **File**: `passkeys-server/src/authentication/__tests__/index.test.ts`
 - **Mocks necessários**:
   - `../../infra/database/database` → `getUser`, `updateUser`
   - `../../infra/database/redis` → `redis.setex`, `redis.get`
@@ -124,13 +124,13 @@ Ambos têm dependências externas mockáveis: MongoDB (`infra/database/database`
   4. Verificação bem-sucedida → atualiza counter via `updateUser`
   5. `verifyAuthenticationResponse` lança exceção → relança o erro
 
-- **Verificação**: `npm test -- --testPathPattern=authentication` — todos os casos passam
+- **Verification**: `npm test -- --testPathPattern=authentication` — todos os casos passam
 
 ### 1b.4 — Verificação de cobertura
 - **Status**: `[x] completed`
 - **depends_on**: [1b.2, 1b.3]
-- **O que fazer**: `npm test -- --coverage`
-- **Verificação**: Relatório mostra ≥ 80% de cobertura de linhas e funções em `registration/` e `authentication/`
+- **What to do**: `npm test -- --coverage`
+- **Verification**: Relatório mostra ≥ 80% de cobertura de linhas e funções em `registration/` e `authentication/`
 
 ---
 
@@ -182,58 +182,58 @@ describe('getRegistrationOptions', () => {
 
 ---
 
-## Instruções para o Orquestrador
+## Orchestrator instructions
 
-> Estas instruções são lidas automaticamente quando você executa `/feature-dev execute RFC-0001 fase 1b`
+> These instructions apply when you run `/feature-dev execute RFC-0001 phase 1b`
 
-**Pré-condição**: verifique que `tasks/rfc-0001/fase-1-status.md` está `[x] completed`. Se não estiver, pare e informe.
+**Precondition:** confirm `tasks/rfc-0001/fase-1-status.md` is `[x] completed`. If not, stop and report.
 
-**Ao iniciar**: atualize o cabeçalho deste arquivo — `Status da fase` para `[~] in_progress`, `Agente responsável` com seu nome, `Iniciado em` com timestamp ISO.
+**On start:** update this file’s header — set **Phase status** to `[~] in_progress`, **Owning agent** to your name, **Started at** to an ISO timestamp.
 
-### BATCH A — sequencial
+### BATCH A — sequential
 Execute **1b.1** (setup Jest):
 - Instale `jest ts-jest @types/jest` como devDependencies no `passkeys-server`
 - Crie `jest.config.ts` conforme spec da subtarefa
 - Atualize `scripts.test` e adicione `scripts.test:watch` no `package.json`
 - Verifique: `npm test` executa sem erro
-- Marque 1b.1 `[x] completed` antes de avançar
+- Mark 1b.1 `[x] completed` antes de avançar
 
-### BATCH B — paralelo
+### BATCH B — parallel
 Dispare dois sub-agentes **simultaneamente**:
 
-**Sub-agente 1 — registration**
+**Sub-agent 1 — registration**
 - Leia `passkeys-server/src/registration/index.ts` na íntegra
 - Crie `passkeys-server/src/registration/__tests__/index.test.ts`
 - Implemente os 5+4 casos listados na subtarefa 1b.2 acima
 - Use as convenções de mock desta fase (seção "Convenções de mock")
-- Marque 1b.2 `[~] in_progress` ao começar, `[x] completed` ou `[!] blocked` ao terminar
+- Mark 1b.2 `[~] in_progress` ao começar, `[x] completed` ou `[!] blocked` ao terminar
 - Verifique: `npm test -- --testPathPattern=registration` passa
 
-**Sub-agente 2 — authentication**
+**Sub-agent 2 — authentication**
 - Leia `passkeys-server/src/authentication/index.ts` na íntegra
 - Crie `passkeys-server/src/authentication/__tests__/index.test.ts`
 - Implemente os 3+5 casos listados na subtarefa 1b.3 acima
 - Use as convenções de mock desta fase (seção "Convenções de mock")
-- Marque 1b.3 `[~] in_progress` ao começar, `[x] completed` ou `[!] blocked` ao terminar
+- Mark 1b.3 `[~] in_progress` ao começar, `[x] completed` ou `[!] blocked` ao terminar
 - Verifique: `npm test -- --testPathPattern=authentication` passa
 
 **Aguarde ambos concluírem** antes de avançar.
 
-### BATCH C — sequencial
+### BATCH C — sequential
 Execute **1b.4** (cobertura):
 - Rode `cd passkeys-server && npm test -- --coverage`
 - Verifique cobertura ≥ 80% em linhas e funções para `registration/` e `authentication/`
-- Marque 1b.4 `[x] completed` se passou, `[!] blocked` se abaixo do threshold
+- Mark 1b.4 `[x] completed` se passou, `[!] blocked` se abaixo do threshold
 
-### Finalização
-- Todos completos → atualize `Status da fase` para `[x] completed` com `Concluído em`
-- Algum bloqueio → atualize `Status da fase` para `[!] blocked` e registre em Blockers
+### Wrap-up
+- All done → set **Phase status** to `[x] completed` with **Completed at**
+- Any block → set **Phase status** to `[!] blocked` and record under Blockers
 
 ---
 
 ## Blockers
 
-_Nenhum bloqueio registrado._
+_No blockers recorded._
 
 ---
 
@@ -248,10 +248,10 @@ _Nenhum bloqueio registrado._
 
 ## Token Usage
 
-> Preencha com o valor exibido na UI do Claude Code ou Cursor ao final da fase.
+> Fill with the value shown in the Claude Code or Cursor UI at the end of the phase.
 
-| Campo | Valor |
+| Field | Value |
 |-------|-------|
-| Ferramenta | Cursor (Sonnet 4.6) |
-| Tokens consumidos | — |
-| Observação | — |
+| Tool | Cursor (Sonnet 4.6) |
+| Tokens consumed | — |
+| Notes | — |

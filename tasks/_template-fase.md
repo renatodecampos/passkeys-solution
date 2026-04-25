@@ -1,66 +1,66 @@
-# Fase {{NUMERO}} — {{TITULO}}
+# Phase {{NUMERO}} — {{TITULO}}
 
-> Template: copie este arquivo para `tasks/rfc-XXXX/fase-{{NUMERO}}-{{slug}}.md` e preencha os
-> campos marcados com `{{}}`. Cada RFC tem sua pasta `tasks/rfc-xxxx/`; as fases recomeçam em 1.
+> Template: copy this file to `tasks/rfc-XXXX/fase-{{NUMERO}}-{{slug}}.md` and fill in fields
+> marked with `{{}}`. Each RFC has its own `tasks/rfc-xxxx/` folder; phase numbers restart at 1.
 >
-> Ao registrar esta fase em `tasks/feedback-forward.md`, use o formato de seção:
-> `## RFC-{ID} — {Título completo da RFC}` (ex: `## RFC-0003 — Minha Nova Iniciativa`).
-> O título completo está no campo `title:` do arquivo da RFC em `rfcs/`.
+> When registering this phase in `tasks/feedback-forward.md`, use the section format:
+> `## RFC-{ID} — {Full RFC title}` (e.g. `## RFC-0003 — My New Initiative`).
+> The full title is in the `title:` field of the RFC file under `rfcs/`.
 
-**Status da fase**: `[ ] pending`
-**Agente responsável**: —
-**Iniciado em**: —
-**Concluído em**: —
-
----
-
-## Pré-requisito
-
-{{FASE_ANTERIOR}} deve estar `[x] completed`. (Remova esta seção se for a primeira fase.)
+**Phase status**: `[ ] pending`  
+**Owning agent**: —  
+**Started at**: —  
+**Completed at**: —
 
 ---
 
-## Critério de conclusão
+## Prerequisite
+
+{{FASE_ANTERIOR}} must be `[x] completed`. (Remove this section if it is the first phase.)
+
+---
+
+## Completion criterion
 
 ```bash
 {{COMANDO_DE_VERIFICACAO}}
 # {{SAIDA_ESPERADA}}
 ```
 
-A fase só está completa quando este comando retorna a saída esperada.
+The phase is complete only when this command produces the expected output.
 
 ---
 
-## Subtarefas
+## Subtasks
 
 ### {{NUMERO}}.1 — {{TITULO_SUBTAREFA}}
 - **Status**: `[ ] pending`
 - **depends_on**: []
-- **Arquivo**: `{{CAMINHO_DO_ARQUIVO}}`
-- **O que fazer**: {{DESCRICAO}}
-- **Verificação**: {{CRITERIO}}
-<!-- Se esta subtarefa requer hardware (emulador, device físico) ou interação manual no SO,
-     adicione a marcação: **[ação manual]** — e separe-a do parallelism map para não bloquear outros batches. -->
+- **File**: `{{CAMINHO_DO_ARQUIVO}}`
+- **What to do**: {{DESCRICAO}}
+- **Verification**: {{CRITERIO}}
+<!-- If this subtask needs hardware (emulator, physical device) or manual OS interaction,
+     add the tag: **[manual action]** — and keep it out of the parallelism map so it does not block other batches. -->
 
 ### {{NUMERO}}.2 — {{TITULO_SUBTAREFA}}
 - **Status**: `[ ] pending`
 - **depends_on**: [{{NUMERO}}.1]
-- **Arquivo**: `{{CAMINHO_DO_ARQUIVO}}`
-- **O que fazer**: {{DESCRICAO}}
-- **Verificação**: {{CRITERIO}}
+- **File**: `{{CAMINHO_DO_ARQUIVO}}`
+- **What to do**: {{DESCRICAO}}
+- **Verification**: {{CRITERIO}}
 
-<!-- Adicione mais subtarefas conforme necessário -->
+<!-- Add more subtasks as needed -->
 
-<!-- NOTA: Documentação não entra nesta fase. É consolidada na Fase de Documentação
-     (última fase de cada RFC). Registre decisões não óbvias no campo ## Notas
-     para que a Fase de Docs possa aproveitá-las. -->
+<!-- NOTE: Documentation is not part of this phase. It is consolidated in the Documentation
+     phase (last phase of each RFC). Record non-obvious decisions in ## Notes
+     so the Docs phase can reuse them. -->
 
-> **Regra (fase de documentação — última fase da RFC):**  
-> Na subtarefa *Atualizar documentação do projeto* (ou equivalente), os **ficheiros a listar** devem
-> incluir, quando existirem, **`README.md` na raiz do repositório** (entrada para clone/GitHub) **além
-> de** `CLAUDE.md` e READMEs de módulos relevantes (ex.: `passkeys-app/README.md`). Só exclua o
-> README raiz se a RFC deixar explícito outro ficheiro como ponto de entrada. Resumir e ligar; não
-> duplicar a RFC.
+> **Rule (documentation phase — last phase of the RFC):**  
+> In the subtask *Update project documentation* (or equivalent), the **files to list** must
+> include, when they exist, **root `README.md`** (entry for clone/GitHub) **in addition to**
+> `CLAUDE.md` and relevant module READMEs (e.g. `passkeys-app/README.md`). Only omit the
+> root README if the RFC explicitly names another file as the entry point. Summarize and link; do
+> not duplicate the RFC.
 
 ---
 
@@ -68,82 +68,82 @@ A fase só está completa quando este comando retorna a saída esperada.
 
 ```
 {{NUMERO}}.1 ─┐
-              ├→ {{NUMERO}}.N  (subtarefas sem dependência rodam em paralelo)
+              ├→ {{NUMERO}}.N  (independent subtasks run in parallel)
 {{NUMERO}}.2 ─┘
 ```
 
 ---
 
-## Instruções para o Orquestrador
+## Orchestrator instructions
 
-> Estas instruções são lidas automaticamente quando você executa `/feature-dev execute RFC-XXXX fase {{IDENTIFICADOR}}`
+> These instructions are read when you run `/feature-dev execute RFC-XXXX phase {{IDENTIFICADOR}}`
 
-**Pré-condição**: verifique que `tasks/rfc-xxxx/{{ARQUIVO_FASE_ANTERIOR}}` está `[x] completed`. Se não estiver, pare e informe.
+**Precondition:** confirm `tasks/rfc-xxxx/{{ARQUIVO_FASE_ANTERIOR}}` is `[x] completed`. If not, stop and report.
 
-**Ao iniciar**: atualize o cabeçalho deste arquivo — `Status da fase` para `[~] in_progress`, `Agente responsável` com seu nome, `Iniciado em` com timestamp ISO.
+**On start:** update the header of this file — **Phase status** to `[~] in_progress`, **Owning agent** with your name, **Started at** with an ISO timestamp.
 
-### BATCH A — {{paralelo|sequencial}}
-<!-- Descreva o primeiro batch. Indique se os sub-agentes rodam em paralelo ou sequencialmente. -->
+### BATCH A — {{parallel|sequential}}
+<!-- Describe the first batch. Say whether sub-agents run in parallel or serially. -->
 
-**Sub-agente 1 — {{NOME}}**
+**Sub-agent 1 — {{NOME}}**
 - {{INSTRUCOES}}
-- Marque {{NUMERO}}.X `[~] in_progress` ao começar, `[x] completed` ou `[!] blocked` ao terminar
+- Mark {{NUMERO}}.X `[~] in_progress` when starting, `[x] completed` or `[!] blocked` when done
 
-**Sub-agente 2 — {{NOME}}** (se paralelo)
+**Sub-agent 2 — {{NOME}}** (if parallel)
 - {{INSTRUCOES}}
-- Marque {{NUMERO}}.X `[~] in_progress` ao começar, `[x] completed` ou `[!] blocked` ao terminar
+- Mark {{NUMERO}}.X `[~] in_progress` when starting, `[x] completed` or `[!] blocked` when done
 
-**Aguarde todos os sub-agentes** antes de avançar.
+**Wait for all sub-agents** before continuing.
 
-### BATCH B — sequencial
-<!-- Descreva os batches seguintes conforme necessário -->
+### BATCH B — sequential
+<!-- Add further batches as needed -->
 
-### Finalização
-- Todos completos → atualize `Status da fase` para `[x] completed` com `Concluído em`
-- Algum bloqueio → atualize `Status da fase` para `[!] blocked` e registre em Blockers
+### Wrap-up
+- All done → set **Phase status** to `[x] completed` with **Completed at**
+- Any block → set **Phase status** to `[!] blocked` and record under Blockers
 
 ---
 
 ## Blockers
 
-_Nenhum bloqueio registrado._
+_No blockers recorded._
 
 ---
 
-## Notas
+## Notes
 
-_Campo livre para o agente registrar observações durante a execução._
+_Free form for the agent to record observations during execution._
 
 ---
 
 ## Feedback Forward
 
-> **Obrigatório** — preenchido pelo agente antes de marcar a fase como `[x] completed`.
-> Ao concluir, copie os insights relevantes para `tasks/feedback-forward.md` (acumulador cross-RFC).
+> **Required** — filled by the agent before marking the phase `[x] completed`.  
+> When done, copy relevant insights to `tasks/feedback-forward.md` (cross-RFC log).
 
-### O que funcionou bem
+### What went well
 - 
 
-### O que atrapalhou / gerou retrabalho
+### What caused friction / rework
 - 
 
-### Atualizações sugeridas para o harness
+### Suggested harness updates
 
-| Arquivo | Seção | Mudança sugerida |
-|---------|-------|-----------------|
+| File | Section | Suggested change |
+|------|---------|------------------|
 | | | |
 
-### Aplicado?
-`[ ]` Ainda não — pendente para a fase de Documentação desta RFC
+### Applied?
+`[ ]` Not yet — pending Documentation phase of this RFC
 
 ---
 
-## Token Usage
+## Token usage
 
-> Preencha com o valor exibido na UI do Claude Code ou Cursor ao final da fase.
+> Fill with the value shown in the Claude Code or Cursor UI at the end of the phase.
 
-| Campo | Valor |
+| Field | Value |
 |-------|-------|
-| Ferramenta | — |
-| Tokens consumidos | — |
-| Observação | — |
+| Tool | — |
+| Tokens consumed | — |
+| Notes | — |

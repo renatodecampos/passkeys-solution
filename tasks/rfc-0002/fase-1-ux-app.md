@@ -1,19 +1,19 @@
-# Fase 1 — UX do app Android (RFC-0002)
+# Phase 1 — Android app UX (RFC-0002)
 
-**Status da fase**: `[x] completed`
-**Agente responsável**: Cursor Agent
-**Iniciado em**: 2026-04-25T12:00:00Z
-**Concluído em**: 2026-04-25T12:30:00Z
+**Phase status**: `[x] completed`
+**Owning agent**: Cursor Agent
+**Started at**: 2026-04-25T12:00:00Z
+**Completed at**: 2026-04-25T12:30:00Z
 
 ---
 
-## Pré-requisito
+## Prerequisite
 
 `tasks/rfc-0001/fase-4-documentacao.md` deve estar `[x] completed`.
 
 ---
 
-## Critério de conclusão
+## Completion criterion
 
 ```bash
 cd passkeys-app && npm test && npm run lint
@@ -24,35 +24,35 @@ A fase só está completa quando este comando retorna a saída esperada.
 
 ---
 
-## Subtarefas
+## Subtasks
 
 ### 1.1 — Calm Card na entrada
 - **Status**: `[x] completed`
 - **depends_on**: []
-- **Arquivo**: `passkeys-app/app/index.tsx`
-- **O que fazer**: Implementar a hierarquia visual da especificação UX: passkey hero, copy curta, label visível de username, botões "Create passkey" e "Sign in with passkey", tokens locais de cor/spacing.
-- **Verificação**: Tela de entrada mantém registro e login funcionando sem importar HTTP fora de `services/api.ts`.
+- **File**: `passkeys-app/app/index.tsx`
+- **What to do**: Implementar a hierarquia visual da especificação UX: passkey hero, copy curta, label visível de username, botões "Create passkey" e "Sign in with passkey", tokens locais de cor/spacing.
+- **Verification**: Tela de entrada mantém registro e login funcionando sem importar HTTP fora de `services/api.ts`.
 
 ### 1.2 — Formulário keyboard-safe
 - **Status**: `[x] completed`
 - **depends_on**: [1.1]
-- **Arquivo**: `passkeys-app/app/index.tsx`
-- **O que fazer**: Usar `KeyboardAvoidingView` e `ScrollView` para manter input, ações e status visíveis quando o teclado Android estiver aberto.
-- **Verificação**: Em emulador, focar username não esconde ações nem feedback.
+- **File**: `passkeys-app/app/index.tsx`
+- **What to do**: Usar `KeyboardAvoidingView` e `ScrollView` para manter input, ações e status visíveis quando o teclado Android estiver aberto.
+- **Verification**: Em emulador, focar username não esconde ações nem feedback.
 
 ### 1.3 — Feedback inline e erros diagnósticos
 - **Status**: `[x] completed`
 - **depends_on**: [1.1]
-- **Arquivo**: `passkeys-app/app/index.tsx`, `passkeys-app/services/api.ts`
-- **O que fazer**: Substituir `Alert` por status inline persistente; diferenciar username vazio, loading, sucesso, cancelamento do prompt, credencial ausente e setup local quando houver sinal suficiente.
-- **Verificação**: Nenhum prompt nativo é acionado com username vazio; loading desabilita botões; erros são exibidos na tela.
+- **File**: `passkeys-app/app/index.tsx`, `passkeys-app/services/api.ts`
+- **What to do**: Substituir `Alert` por status inline persistente; diferenciar username vazio, loading, sucesso, cancelamento do prompt, credencial ausente e setup local quando houver sinal suficiente.
+- **Verification**: Nenhum prompt nativo é acionado com username vazio; loading desabilita botões; erros são exibidos na tela.
 
 ### 1.4 — Home Proof
 - **Status**: `[x] completed`
 - **depends_on**: [1.3]
-- **Arquivo**: `passkeys-app/app/home.tsx`
-- **O que fazer**: Implementar tela autenticada com username, status `verified: true`, método `passkey`, tipo de resposta `JSON` e logout.
-- **Verificação**: Após registro/login bem-sucedido, a home mostra prova resumida da verificação do servidor.
+- **File**: `passkeys-app/app/home.tsx`
+- **What to do**: Implementar tela autenticada com username, status `verified: true`, método `passkey`, tipo de resposta `JSON` e logout.
+- **Verification**: Após registro/login bem-sucedido, a home mostra prova resumida da verificação do servidor.
 
 ---
 
@@ -67,56 +67,56 @@ A fase só está completa quando este comando retorna a saída esperada.
 
 ---
 
-## Instruções para o Orquestrador
+## Orchestrator instructions
 
-> Estas instruções são lidas automaticamente quando você executa `/feature-dev execute RFC-0002 fase 1`
+> These instructions apply when you run `/feature-dev execute RFC-0002 phase 1`
 
-**Pré-condição**: verifique que `tasks/rfc-0001/fase-4-documentacao.md` está `[x] completed`. Se não estiver, pare e informe.
+**Precondition:** confirm `tasks/rfc-0001/fase-4-documentacao.md` is `[x] completed`. If not, stop and report.
 
-**Ao iniciar**: atualize o cabeçalho deste arquivo — `Status da fase` para `[~] in_progress`, `Agente responsável` com seu nome, `Iniciado em` com timestamp ISO.
+**On start:** update this file’s header — set **Phase status** to `[~] in_progress`, **Owning agent** to your name, **Started at** to an ISO timestamp.
 
-### BATCH A — sequencial
+### BATCH A — sequential
 
 Execute **1.1**:
 - Leia `rfcs/completed/RFC-0002-ux-passkeys-poc.md`
 - Leia `_bmad-output/planning-artifacts/ux-design-specification.md`
 - Atualize `passkeys-app/app/index.tsx` com a direção Calm Card
 - Preserve a regra: `react-native-passkey` só em `app/index.tsx`
-- Marque 1.1 `[x] completed` ou `[!] blocked`
+- Mark 1.1 `[x] completed` ou `[!] blocked`
 
-### BATCH B — paralelo
+### BATCH B — parallel
 
-Dispare dois sub-agentes simultaneamente:
+Run two sub-agents in parallel:
 
-**Sub-agente 1 — Keyboard-safe**
+**Sub-agent 1 — Keyboard-safe**
 - Execute 1.2 em `passkeys-app/app/index.tsx`
 - Valide que input, botões e status permanecem acessíveis com teclado aberto
-- Marque 1.2 `[x] completed` ou `[!] blocked`
+- Mark 1.2 `[x] completed` ou `[!] blocked`
 
-**Sub-agente 2 — Feedback e erros**
+**Sub-agent 2 — Feedback e erros**
 - Execute 1.3 em `passkeys-app/app/index.tsx` e, se necessário, `passkeys-app/services/api.ts`
 - Não coloque lógica de passkey ou fetch direto em componentes fora dos limites existentes
-- Marque 1.3 `[x] completed` ou `[!] blocked`
+- Mark 1.3 `[x] completed` ou `[!] blocked`
 
-**Aguarde os dois** antes de avançar.
+**Wait for both** before continuing.
 
-### BATCH C — sequencial
+### BATCH C — sequential
 
 Execute **1.4**:
 - Atualize `passkeys-app/app/home.tsx` para Home Proof
 - Garanta que logout retorna para `/` sem apagar passkey
-- Marque 1.4 `[x] completed` ou `[!] blocked`
+- Mark 1.4 `[x] completed` ou `[!] blocked`
 
-### Finalização
+### Wrap-up
 - Rode `cd passkeys-app && npm test && npm run lint`
-- Todos completos e verificação passando → atualize `Status da fase` para `[x] completed` com `Concluído em`
-- Algum bloqueio → atualize `Status da fase` para `[!] blocked` e registre em Blockers
+- All done and checks pass → set **Phase status** to `[x] completed` with **Completed at**
+- Any block → set **Phase status** to `[!] blocked` and record under Blockers
 
 ---
 
 ## Blockers
 
-_Nenhum bloqueio registrado._
+_No blockers recorded._
 
 ---
 
@@ -129,9 +129,9 @@ _Nenhum bloqueio registrado._
 
 ## Token Usage
 
-| Campo | Valor |
+| Field | Value |
 |-------|-------|
-| Ferramenta | Cursor (agente, execução fase 1) |
-| Tokens consumidos | 78,6k (≈78.6k) |
+| Tool | Cursor (agente, execução fase 1) |
+| Tokens consumed | 78,6k (≈78.6k) |
 | Janela de contexto | 39,3% utilizada |
-| Observação | Medição informada após conclusão desta fase. |
+| Notes | Medição informada após conclusão desta fase. |
