@@ -20,6 +20,12 @@ It is also a **structured engineering experiment**: the entire development was o
 
 ---
 
+## Demo
+
+![Demo — RFC-0002: passkey registration and authentication on Android](demos/demo-rfc-0002.mp4)
+
+---
+
 ## Features
 
 - **Registration** — creates a passkey tied to the user's device and biometrics
