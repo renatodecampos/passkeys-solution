@@ -1,8 +1,6 @@
-# RFC-0003: Visual identity — App icon, splash screen e tema Light Clean
-
 ---
 rfc_id: RFC-0003
-title: Visual identity — App icon, splash screen e tema Light Clean
+title: Visual Identity — App icon, splash screen and Light Clean theme
 status: PROPOSED
 author: Renato de Campos
 reviewers: []
@@ -11,58 +9,60 @@ last_updated: 2026-04-25
 decision_date: —
 ---
 
+# RFC-0003: Visual Identity — App icon, splash screen and Light Clean theme
+
 ## Overview
 
-Este RFC especifica a identidade visual do app Passkey Demo: ícone de aplicativo, splash screen e
-alinhamento dos tokens de cor ao tema **Light Clean**. O objetivo é substituir os placeholders
-padrão do Expo por ativos com identidade própria, garantindo consistência visual entre a primeira
-impressão do app (launcher, splash) e a UI já implementada em RFC-0002.
+This RFC specifies the visual identity of the Passkey Demo app: application icon, splash screen,
+and color token alignment to the **Light Clean** theme. The goal is to replace Expo's default
+placeholders with branded assets, ensuring visual consistency between the app's first impression
+(launcher, splash) and the UI already implemented in RFC-0002.
 
 ## Background & Context
 
-### Estado atual
+### Current state
 
-RFC-0001 e RFC-0002 estão completos. O sistema funciona end-to-end. A UI do app usa a paleta
-correta (`#F8FAFC` bg, `#2563EB` primary, etc.), mas os ativos visuais de identidade são todos
-defaults do Expo SDK:
+RFC-0001 and RFC-0002 are complete. The system works end-to-end. The app UI uses the correct
+color palette (`#F8FAFC` bg, `#2563EB` primary, etc.), but all visual identity assets are Expo
+SDK defaults:
 
 ```
 passkeys-app/assets/images/
-├── icon.png          ← placeholder Expo (círculos concêntricos, fundo cinza)
-├── adaptive-icon.png ← placeholder Expo (mesmo conteúdo)
-├── splash-icon.png   ← placeholder Expo (mesmo conteúdo)
-└── favicon.png       ← placeholder Expo (16×16 genérico)
+├── icon.png          ← Expo placeholder (concentric circles, grey background)
+├── adaptive-icon.png ← Expo placeholder (same content)
+├── splash-icon.png   ← Expo placeholder (same content)
+└── favicon.png       ← Expo placeholder (generic 16×16)
 ```
 
-O arquivo `app.json` referencia esses ativos sem cor de fundo customizada, resultando em splash
-branca com ícone genérico ao inicializar o app.
+`app.json` references these assets without a custom background color, resulting in a white splash
+with a generic icon on startup.
 
-### Documentos relacionados
+### Related documents
 
 - `rfcs/completed/RFC-0001-passkeys-poc-completion.md`
 - `rfcs/completed/RFC-0002-ux-passkeys-poc.md`
 - `_bmad-output/planning-artifacts/ux-design-specification.md`
 
-### Glossário
+### Glossary
 
-| Termo | Definição |
-|-------|-----------|
-| Light Clean | Variante de tema com fundo `#F8FAFC`, primary `#2563EB`, texto `#0F172A` |
-| Lock Icon | Símbolo de cadeado geométrico usado como identidade visual principal |
-| Adaptive Icon | Formato Android com foreground + background separados (API 26+) |
-| Splash backgroundColor | Cor sólida exibida enquanto o bundle JS carrega, antes do `SplashScreen` do Expo |
+| Term | Definition |
+|------|-----------|
+| Light Clean | Theme variant with `#F8FAFC` background, `#2563EB` primary, `#0F172A` text |
+| Lock Icon | Geometric padlock symbol used as the primary visual identity |
+| Adaptive Icon | Android format with separate foreground + background layers (API 26+) |
+| Splash backgroundColor | Solid color shown while the JS bundle loads, before Expo's `SplashScreen` |
 
 ---
 
-## Problem statement
+## Problem Statement
 
-O app não tem identidade visual própria. Na inicialização, o usuário vê o ícone padrão do Expo
-no launcher e uma splash branca sem marca. Isso prejudica demos, porque a primeira impressão não
-comunica "app de autenticação segura" — e qualquer screenshot ou vídeo de demonstração expõe os
-placeholders. O RFC-0002 melhorou a UI interna; este RFC cobre a camada externa.
+The app has no visual identity of its own. On startup, the user sees the Expo default icon in the
+launcher and a plain white splash with no branding. This hurts demos because the first impression
+does not communicate "secure authentication app" — and any screenshot or demo video exposes the
+placeholders. RFC-0002 improved the internal UI; this RFC covers the outer layer.
 
-**Se não endereçarmos:** qualquer demo, vídeo ou screenshot do app continuará com aparência de
-scaffold, reduzindo a credibilidade do PoC como referência de implementação.
+**If not addressed:** any demo, video, or screenshot will continue to look like a scaffold,
+reducing the credibility of the PoC as an implementation reference.
 
 ---
 
@@ -70,164 +70,171 @@ scaffold, reduzindo a credibilidade do PoC como referência de implementação.
 
 ### Goals
 
-- Substituir `icon.png`, `adaptive-icon.png`, `splash-icon.png` e `favicon.png` por ativos com
-  identidade do projeto
-- Configurar `app.json` com `backgroundColor` e `splash.backgroundColor` alinhados ao Light Clean
-- Manter compatibilidade com Expo SDK 53 e o formato de ícone Android (adaptive icon)
-- Não adicionar nova dependência nativa
-- Não alterar nenhum arquivo de código TypeScript/React Native
+- Replace `icon.png`, `adaptive-icon.png`, `splash-icon.png`, and `favicon.png` with branded assets
+- Configure `app.json` with `backgroundColor` and `splash.backgroundColor` aligned to Light Clean
+- Maintain compatibility with Expo SDK 53 and the Android adaptive icon format
+- Add no new native dependency
+- Modify no TypeScript/React Native source files
 
 ### Non-Goals
 
-- Suporte a ícone iOS (fora do escopo do PoC Android)
-- Animação nativa de splash via `expo-splash-screen` além do que já existe
-- Branding de produto ou nome comercial
-- Criação de um design system reutilizável
+- iOS icon support (out of scope for this Android PoC)
+- Native splash animation via `expo-splash-screen` beyond what already exists
+- Commercial product branding or trademarked name
+- Building a reusable design system
 
 ---
 
-## Evaluation criteria
+## Evaluation Criteria
 
-| Critério | Peso | Descrição |
-|----------|------|-----------|
-| Consistência visual | Alto | Ícone e splash devem usar os mesmos tokens de cor da UI |
-| Clareza de identidade | Alto | Ícone legível em 48 px; comunica autenticação/segurança |
-| Compatibilidade Expo | Alto | Dimensões e formato corretos para `expo-build-service` |
-| Tempo de implementação | Médio | Substituição de arquivo, sem compilação nativa extra |
-| Qualidade de demo | Médio | Screenshots e vídeos não expõem placeholders |
+| Criterion | Weight | Description |
+|-----------|--------|-------------|
+| Visual consistency | High | Icon and splash must use the same color tokens as the UI |
+| Identity clarity | High | Icon readable at 48 px; communicates authentication/security |
+| Expo compatibility | High | Correct dimensions and format for `expo-build-service` |
+| Implementation effort | Medium | File replacement, no extra native compilation |
+| Demo quality | Medium | Screenshots and videos no longer expose placeholders |
 
 ---
 
-## Options analysis
+## Options Analysis
 
-### Option 1: Cadeado geométrico (Lock Icon)
+### Option 1: Geometric padlock (Lock Icon)
 
-**Descrição:** Ícone de cadeado minimalista com shackle arredondada e corpo retangular.
-Fundo `#F8FAFC` (Light Clean), cadeado em `#2563EB` (primary). Splash com mesmo ícone
-centralizado + "Passkey Demo" abaixo, separados por linha divisória sutil.
+**Description:** Minimalist padlock icon with a rounded shackle and rectangular body.
+Background `#F8FAFC` (Light Clean), lock in `#2563EB` (primary). Splash with the same icon
+centered + "Passkey Demo" below, separated by a subtle divider.
 
 **Pros:**
-- Metáfora direta: cadeado = autenticação segura
-- Leitura clara em 32 px (launcher, notificações)
-- Tokens idênticos aos já usados em `app/index.tsx` (T.primary, T.bg)
-- Sem SVG complexo — formas geométricas simples
+- Direct metaphor: padlock = secure authentication
+- Clear at 32 px (launcher, notifications)
+- Identical tokens to those already used in `app/index.tsx` (T.primary, T.bg)
+- No complex SVG — simple geometric shapes
 
 **Cons:**
-- Cadeado é ícone comum em apps de segurança (menor unicidade)
+- Padlock is a common icon in security apps (lower uniqueness)
 
 **Scoring:**
-| Critério | Score | Notas |
-|----------|-------|-------|
-| Consistência visual | Alto | Tokens idênticos à UI |
-| Clareza de identidade | Alto | Leitura imediata em qualquer tamanho |
-| Compatibilidade Expo | Alto | PNG gerado em canvas sem SVG externo |
-| Tempo de implementação | Alto | Apenas substituição de arquivos |
-| Qualidade de demo | Alto | Elimina placeholders |
+| Criterion | Score | Notes |
+|-----------|-------|-------|
+| Visual consistency | High | Identical tokens to the UI |
+| Identity clarity | High | Immediately readable at any size |
+| Expo compatibility | High | PNG generated via canvas, no external SVG |
+| Implementation effort | High | File replacement only |
+| Demo quality | High | Eliminates placeholders |
 
-**Esforço:** Baixo — geração de PNGs + edição de `app.json`.  
-**Risco:** Baixo. Nenhuma mudança em código nativo.
+**Effort:** Low — PNG generation + `app.json` edit.
+**Risk:** Low. No native code changes.
 
 ---
 
-### Option 2: Impressão digital (Fingerprint)
+### Option 2: Fingerprint (Biometric rings)
 
-**Descrição:** Anéis concêntricos com abertura inferior (padrão whorl), representando
-biometria. Fundo escuro (`#080D1A`), anéis em ciano (`#38BDF8`). Visual mais técnico/dark.
+**Description:** Concentric arcs with a bottom gap (whorl pattern), representing biometrics.
+Dark background (`#080D1A`), rings in cyan (`#38BDF8`). More technical/dark aesthetic.
 
 **Pros:**
-- Referência direta à biometria do WebAuthn
-- Visual distintivo e moderno
+- Direct reference to WebAuthn biometrics
+- Distinctive and modern look
 
 **Cons:**
-- Contraste invertido: ícone escuro não combina com a UI Light Clean do app
-- Pode parecer "genérico" (anéis concêntricos são o próprio placeholder Expo)
+- Inverted contrast: dark icon does not match the app's Light Clean UI
+- May look generic (concentric rings are Expo's own placeholder)
 
 **Scoring:**
-| Critério | Score | Notas |
-|----------|-------|-------|
-| Consistência visual | Médio | Contraste oposto à UI interna |
-| Clareza de identidade | Alto | Biometria é reconhecida |
-| Compatibilidade Expo | Alto | — |
-| Tempo de implementação | Alto | — |
-| Qualidade de demo | Médio | Desalinhamento visual com o app |
+| Criterion | Score | Notes |
+|-----------|-------|-------|
+| Visual consistency | Medium | Opposite contrast to the internal UI |
+| Identity clarity | High | Biometrics are recognizable |
+| Expo compatibility | High | — |
+| Implementation effort | High | — |
+| Demo quality | Medium | Visual misalignment with the app |
 
-**Esforço:** Baixo.  
-**Risco:** Baixo, mas inconsistência com o tema Light Clean.
+**Effort:** Low.
+**Risk:** Low, but visually inconsistent with the Light Clean theme.
 
 ---
 
 ## Recommendation
 
-**Option 1: Cadeado geométrico (Lock Icon)**
+**Option 1: Geometric padlock (Lock Icon)**
 
-Alinha com a UI já validada no RFC-0002, usa os mesmos tokens, e comunica autenticação segura
-sem depender de metáfora biométrica que conflita visualmente com o tema claro do app.
+Aligns with the UI validated in RFC-0002, uses the same tokens, and communicates secure
+authentication without relying on a biometric metaphor that visually conflicts with the light theme.
+
+> **Note:** The implemented assets use the fingerprint biometric design (Option 2) with the
+> Light Clean palette (`#F8FAFC` bg, `#2563EB` primary), which was the final choice made during
+> the design iteration in `Passkey Icon Design.html`. The lock icon appears on the in-app
+> `SplashScreen` component (React Native layer), while the native splash uses the fingerprint icon.
 
 ---
 
-## Technical design
+## Technical Design
 
-### Tokens de cor
+### Color tokens
 
-Idênticos ao mapa de tokens já em uso em `app/index.tsx` e `app/home.tsx`:
+Identical to the token map already in use in `app/index.tsx` and `app/home.tsx`:
 
-| Token | Valor | Uso |
-|-------|-------|-----|
-| `bg` | `#F8FAFC` | Fundo do ícone, splash background |
-| `surface` | `#FFFFFF` | Fundo de cards |
-| `primary` | `#2563EB` | Cadeado, contornos, accent |
-| `text` | `#0F172A` | Título na splash |
-| `textSecondary` | `#475569` | Tagline na splash |
-| `border` | `#E2E8F0` | Linha divisória na splash |
+| Token | Value | Usage |
+|-------|-------|-------|
+| `bg` | `#F8FAFC` | Icon background, splash background |
+| `surface` | `#FFFFFF` | Card backgrounds |
+| `primary` | `#2563EB` | Lock/fingerprint, outlines, accent |
+| `text` | `#0F172A` | Title on splash |
+| `textSecondary` | `#475569` | Tagline on splash |
+| `border` | `#E2E8F0` | Divider line on splash |
 
-### Especificação do ícone
-
-```
-Forma: cadeado geométrico
-  Shackle:  largura 28 px, altura 30 px, raio 14 px (medidas em canvas 200×200)
-  Corpo:    56×42 px, border-radius 10 px
-  Buraco:   círculo r=7 px + haste vertical
-  Cor:      #2563EB (stroke + fill alpha 0.07)
-  Fundo:    #F8FAFC (fill)
-
-Arquivos a gerar (PNG, canal alpha para adaptive-icon foreground):
-  icon.png           1024×1024 px   corners radius 22% (iOS-safe)
-  adaptive-icon.png  1024×1024 px   sem corners (Android recorta via máscara)
-  splash-icon.png     200×200 px    sem corners
-  favicon.png          32×32 px    sem corners
-```
-
-### Especificação da splash screen
+### Icon specification
 
 ```
-Dimensões: viewport do dispositivo (Expo gerencia)
-Fundo:     #F8FAFC  (splash.backgroundColor em app.json)
-Conteúdo:
-  [cadeado]        splash-icon.png centralizado
-  [divisória]      linha horizontal 1 px, cor #E2E8F0, largura 48 px
-  [título]         "Passkey Demo" — DM Sans 700, 20 px, #0F172A
-  [tagline]        "PASSWORDLESS · SECURE" — DM Mono 400, 11 px, #2563EB, letter-spacing 0.12em
+Shape: biometric fingerprint rings (whorl pattern)
+  Rings:    9 concentric arcs, r = 6..62 px (at 200px canvas scale)
+  Gap:      bottom opening, grows from 0° to 70° on outer rings
+  Color:    #2563EB (stroke), glow shadow same color
+  Stroke:   2.2 × scale px, lineCap round
+  Background: #F8FAFC (fill)
 
-Layout: flex column, align center, justify center; título nunca sobrepõe o ícone
+Files to generate (PNG):
+  icon.png           1024×1024 px   rounded corners radius 22% (iOS-safe)
+  adaptive-icon.png  1024×1024 px   no corners (Android clips via mask)
+  splash-icon.png     200×200 px    no corners
+  favicon.png          32×32 px     no corners
 ```
 
-### Mudanças em `app.json`
+### Splash screen specification
+
+```
+Dimensions: device viewport (managed by Expo)
+Background: #F8FAFC  (splash.backgroundColor in app.json)
+Content:
+  [icon]      splash-icon.png centered (200×200, resizeMode: contain)
+  [divider]   horizontal line 1 px, color #E2E8F0, width 48 px
+  [title]     "Passkey Demo" — DM Sans 700, 20 px, #0F172A
+  [tagline]   "PASSWORDLESS · SECURE" — DM Mono 400, 11 px, #2563EB, letter-spacing 0.12em
+
+Layout: flex column, align center, justify center; title never overlaps the icon
+```
+
+### `app.json` changes
 
 ```jsonc
 {
   "expo": {
     "name": "Passkey Demo",
     "icon": "./assets/images/icon.png",
-    "backgroundColor": "#F8FAFC",          // ← adicionar
-    "splash": {
-      "image": "./assets/images/splash-icon.png",
-      "backgroundColor": "#F8FAFC",        // ← atualizar (era "#ffffff" implícito)
-      "resizeMode": "contain"
-    },
+    "backgroundColor": "#F8FAFC",          // ← add
+    "plugins": [
+      ["expo-splash-screen", {
+        "image": "./assets/images/splash-icon.png",
+        "imageWidth": 200,
+        "resizeMode": "contain",
+        "backgroundColor": "#F8FAFC"       // ← update (was "#ffffff")
+      }]
+    ],
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
-        "backgroundColor": "#F8FAFC"       // ← atualizar (era "#FFFFFF")
+        "backgroundColor": "#F8FAFC"       // ← update (was "#FFFFFF")
       }
     },
     "web": {
@@ -237,110 +244,107 @@ Layout: flex column, align center, justify center; título nunca sobrepõe o íc
 }
 ```
 
-> **Nota:** o campo `splash.image` aponta para `splash-icon.png` (200×200), não para `icon.png`.
-> O Expo posiciona e escala `splash-icon.png` sobre o `backgroundColor` conforme `resizeMode`.
+> **Note:** `splash.image` points to `splash-icon.png` (200×200). Expo centers and scales it
+> over `backgroundColor` according to `resizeMode`.
 
-### Geração dos PNGs
+### PNG generation
 
-Os ativos são gerados via canvas HTML (sem dependência de ferramenta de design externa).
-O arquivo de referência é `Passkey Icon Design.html` na raiz do projeto de design.
+Assets are generated via a Node.js canvas script (`/tmp/gen-icons/generate.js`) using the
+`canvas` npm package. The design reference is `Passkey Icon Design.html` (Light Clean variant).
 
-Procedimento:
-1. Abrir `Passkey Icon Design.html` no browser
-2. Selecionar variante **Light Clean**
-3. Clicar em cada botão de export:
-   - `↓ icon.png (1024×1024)` → salvar em `passkeys-app/assets/images/icon.png`
-   - `↓ adaptive-icon.png`    → salvar em `passkeys-app/assets/images/adaptive-icon.png`
-   - `↓ splash-icon.png`      → salvar em `passkeys-app/assets/images/splash-icon.png`
-   - `↓ favicon.png (32×32)`  → salvar em `passkeys-app/assets/images/favicon.png`
+To regenerate:
+```bash
+cd /tmp/gen-icons
+node generate.js /path/to/passkeys-app/assets/images/
+```
 
-### Verificação
+### Verification
 
-Após substituição dos arquivos:
+After replacing the files:
 
 ```bash
 cd passkeys-app
 npx expo run:android
-# Verificar:
-# 1. Ícone no launcher mostra cadeado azul sobre fundo claro
-# 2. Splash mostra fundo #F8FAFC (sem flash branco/preto)
-# 3. Layout interno do app inalterado (sem regressão de UI)
+# Check:
+# 1. Launcher icon shows blue fingerprint on light background
+# 2. Splash shows #F8FAFC background (no white/black flash)
+# 3. Internal app layout unchanged (no UI regression)
 ```
 
 ---
 
-## Implementation plan
+## Implementation Plan
 
-### Phase 1 — Geração e substituição dos ativos
+### Phase 1 — Asset generation and replacement
 
-| Passo | Arquivo(s) | Descrição |
-|-------|-----------|-----------|
-| 1.1 | `passkeys-app/assets/images/icon.png` | Substituir por export Light Clean 1024×1024 |
-| 1.2 | `passkeys-app/assets/images/adaptive-icon.png` | Substituir por export Light Clean 1024×1024 |
-| 1.3 | `passkeys-app/assets/images/splash-icon.png` | Substituir por export Light Clean 200×200 |
-| 1.4 | `passkeys-app/assets/images/favicon.png` | Substituir por export Light Clean 32×32 |
+| Step | File(s) | Description |
+|------|---------|-------------|
+| 1.1 | `passkeys-app/assets/images/icon.png` | Replace with Light Clean export 1024×1024 |
+| 1.2 | `passkeys-app/assets/images/adaptive-icon.png` | Replace with Light Clean export 1024×1024 |
+| 1.3 | `passkeys-app/assets/images/splash-icon.png` | Replace with Light Clean export 200×200 |
+| 1.4 | `passkeys-app/assets/images/favicon.png` | Replace with Light Clean export 32×32 |
 
-**Arquivo de tarefa:** `tasks/rfc-0003/fase-1-ativos.md`  
-**Critério de conclusão:** os quatro arquivos PNG substituídos, sem arquivos extras criados.
+**Task file:** `tasks/rfc-0003/phase-1-assets.md`
+**Completion criterion:** four PNG files replaced, no extra files created.
 
-### Phase 2 — Configuração do `app.json`
+### Phase 2 — `app.json` configuration
 
-| Passo | Arquivo(s) | Descrição |
-|-------|-----------|-----------|
-| 2.1 | `passkeys-app/app.json` | Adicionar `backgroundColor: "#F8FAFC"` no root |
-| 2.2 | `passkeys-app/app.json` | Atualizar `splash.backgroundColor` para `"#F8FAFC"` |
-| 2.3 | `passkeys-app/app.json` | Atualizar `android.adaptiveIcon.backgroundColor` para `"#F8FAFC"` |
+| Step | File(s) | Description |
+|------|---------|-------------|
+| 2.1 | `passkeys-app/app.json` | Add `backgroundColor: "#F8FAFC"` at root |
+| 2.2 | `passkeys-app/app.json` | Update splash plugin `backgroundColor` to `"#F8FAFC"` |
+| 2.3 | `passkeys-app/app.json` | Update `android.adaptiveIcon.backgroundColor` to `"#F8FAFC"` |
 
-**Arquivo de tarefa:** `tasks/rfc-0003/fase-2-appjson.md`  
-**Critério de conclusão:** `app.json` válido (JSON parse sem erro) com os três campos atualizados.
+**Task file:** `tasks/rfc-0003/phase-2-appjson.md`
+**Completion criterion:** `app.json` valid JSON with all three fields updated.
 
-### Phase 3 — Validação no emulador
+### Phase 3 — Emulator validation
 
-| Passo | Arquivo(s) | Descrição |
-|-------|-----------|-----------|
-| 3.1 | — | `npx expo run:android` no emulador API 34+ |
-| 3.2 | — | Confirmar ícone no launcher |
-| 3.3 | — | Confirmar splash com fundo correto e sem flash |
-| 3.4 | — | Confirmar que o fluxo register → home → logout funciona (sem regressão) |
-| 3.5 | `tasks/rfc-0003/fase-3-validacao.md` | Registrar evidência (checklist de itens acima) |
+| Step | File(s) | Description |
+|------|---------|-------------|
+| 3.1 | — | `npx expo run:android` on API 34+ emulator |
+| 3.2 | — | Confirm launcher icon shows branded icon |
+| 3.3 | — | Confirm splash background and no flash |
+| 3.4 | — | Confirm register → home → logout flow (no regression) |
+| 3.5 | `tasks/rfc-0003/phase-3-validation.md` | Record evidence (checklist above) |
 
-**Arquivo de tarefa:** `tasks/rfc-0003/fase-3-validacao.md`  
-**Critério de conclusão:** os quatro itens de validação marcados `[x]` no arquivo de tarefa.
+**Task file:** `tasks/rfc-0003/phase-3-validation.md`
+**Completion criterion:** all four validation items marked `[x]`.
 
-### Phase 4 — Documentação
+### Phase 4 — Documentation
 
-Escopo fixo:
-- Mover este RFC para `rfcs/completed/RFC-0003-visual-identity.md`
-- Preencher `## Decision Record` abaixo
-- Atualizar `passkeys-app/README.md` se a seção de setup mencionar ícone ou splash
+Fixed scope:
+- Move this RFC to `rfcs/completed/RFC-0003-visual-identity.md`
+- Fill in `## Decision Record` below
+- Update `passkeys-app/README.md` if the setup section mentions icon or splash
 
-**Critério de conclusão:** RFC em `completed/` com Decision Record preenchido.
+**Completion criterion:** RFC in `completed/` with Decision Record filled in.
 
 ### Rollback
 
-Rollback é substituição de arquivo:
-- Restaurar os quatro PNGs originais do Expo (disponíveis em qualquer scaffold `npx create-expo-app`)
-- Reverter `app.json` para os valores originais (sem `backgroundColor` explícito)
+Rollback is a file replacement:
+- Restore the four original Expo PNGs (available in any `npx create-expo-app` scaffold)
+- Revert `app.json` to original values (remove explicit `backgroundColor`)
 
-Sem mudança em código TypeScript, sem impacto em testes ou lint.
-
----
-
-## Open questions
-
-1. **`splash.image` vs `splash-icon.png`:** confirmar se o Expo SDK 53 renderiza melhor com
-   o ícone em 200×200 (`contain`) ou em resolução maior com `resizeMode: "cover"`.
-2. **Dark mode:** o Android pode exibir o adaptive icon sobre fundo escuro em certas launchers.
-   Confirmar se `backgroundColor: "#F8FAFC"` é suficiente ou se é necessário um `monochrome`
-   icon layer (API 33+).
-3. **EAS Build:** confirmar que os PNGs exportados via canvas (sem canal alpha no fundo) são
-   aceitos pelo pipeline `eas build` sem pré-processamento adicional.
+No TypeScript changes, no impact on tests or lint.
 
 ---
 
-## Decision record
+## Open Questions
 
-_(a preencher após aprovação e implementação)_
+1. **`splash.image` vs `splash-icon.png`:** confirm whether Expo SDK 53 renders better with
+   the icon at 200×200 (`contain`) or at higher resolution with `resizeMode: "cover"`.
+2. **Dark mode:** Android may display the adaptive icon on a dark background in some launchers.
+   Confirm whether `backgroundColor: "#F8FAFC"` is sufficient or if a `monochrome` icon layer
+   (API 33+) is needed.
+3. **EAS Build:** confirm that canvas-exported PNGs (no alpha on background) are accepted by
+   the `eas build` pipeline without additional pre-processing.
+
+---
+
+## Decision Record
+
+_(to be filled after approval and implementation)_
 
 - **Date:** —
 - **Decision:** —
