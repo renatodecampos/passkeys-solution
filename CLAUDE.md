@@ -5,6 +5,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Project overview
 
 A passkeys (WebAuthn/FIDO2) passwordless authentication system with two components:
+
 - **passkeys-server**: TypeScript/Fastify backend
 - **passkeys-app**: Expo/React Native cross-platform frontend
 
@@ -121,24 +122,27 @@ infra/logger.ts             # Winston logger
 ### App (`passkeys-app/app/`)
 
 File-based routing via Expo Router (similar to Next.js):
+
 - `_layout.tsx` — root Stack + Theme layout
 - `index.tsx` — public entry (Calm Card, register/sign in with passkey — RFC-0002)
 - `home.tsx` — authenticated screen (Home Proof: short server verification)
 - `(tabs)/` — tab group (e.g. explore); passkey flow uses `/` and `/home`
-- Path alias `@/*` maps to project root
+- Path alias `@/`* maps to project root
 
 ## Environment variables
 
 Copy `.env-example` in `passkeys-server/` before running the server. Required variables:
 
-| Variable | Purpose |
-|---|---|
-| `RP_ID`, `RP_NAME`, `RP_ORIGIN` | WebAuthn relying party config (`RP_ORIGIN=https://localhost:3000`) |
-| `MONGODB_URI`, `DB_NAME`, `COLLECTION_NAME` | MongoDB connection |
-| `REDIS_URL` | Full Redis URL (e.g. `redis://localhost:6379`) |
-| `SESSION_SECRET` | Secure cookie signing |
-| `ANDROID_CERT_FINGERPRINT` | SHA-256 of the Android debug keystore |
-| `ANDROID_ORIGIN` | Android WebAuthn origin (e.g. `android:apk-key-hash:<base64>`) |
+
+| Variable                                    | Purpose                                                            |
+| ------------------------------------------- | ------------------------------------------------------------------ |
+| `RP_ID`, `RP_NAME`, `RP_ORIGIN`             | WebAuthn relying party config (`RP_ORIGIN=https://localhost:3000`) |
+| `MONGODB_URI`, `DB_NAME`, `COLLECTION_NAME` | MongoDB connection                                                 |
+| `REDIS_URL`                                 | Full Redis URL (e.g. `redis://localhost:6379`)                     |
+| `SESSION_SECRET`                            | Secure cookie signing                                              |
+| `ANDROID_CERT_FINGERPRINT`                  | SHA-256 of the Android debug keystore                              |
+| `ANDROID_ORIGIN`                            | Android WebAuthn origin (e.g. `android:apk-key-hash:<base64>`)     |
+
 
 To obtain `ANDROID_CERT_FINGERPRINT`:
 
@@ -161,6 +165,7 @@ cd passkeys-app && npm test
 ```
 
 > **App setup dependency:** `jest.config.ts` uses TypeScript. For Jest to run it, `ts-node` must be installed as a devDependency in `passkeys-app`:
+>
 > ```bash
 > cd passkeys-app && npm install --save-dev ts-node
 > ```
@@ -177,8 +182,13 @@ This project uses agent-assisted execution with state tracked in files:
 - `tasks/rfc-0002/fase-1-ux-app.md` — app UX (RFC-0002)
 - `tasks/rfc-0002/fase-2-ux-validacao.md` — UX/E2E validation (RFC-0002)
 - `tasks/rfc-0002/fase-3-documentacao.md` — final documentation (RFC-0002)
+- `tasks/rfc-0003/fase-1-assets.md` — visual identity: branded PNGs (RFC-0003)
+- `tasks/rfc-0003/fase-2-appjson.md` — `app.json` Light Clean + splash (RFC-0003)
+- `tasks/rfc-0003/fase-3-validacao.md` — device / prebuild validation (RFC-0003)
+- `tasks/rfc-0003/fase-4-documentacao.md` — RFC-0003 documentation close-out
 - `rfcs/completed/RFC-0001-passkeys-poc-completion.md` — base plan
 - `rfcs/completed/RFC-0002-ux-passkeys-poc.md` — UX evolution (completed)
+- `rfcs/completed/RFC-0003-visual-identity.md` — app icon, splash, Light Clean (completed)
 
 Phases are sequential. Within a phase, subtasks with no dependency may run in parallel.  
 See `tasks/README.md` for the status legend.

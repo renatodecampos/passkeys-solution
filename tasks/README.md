@@ -26,6 +26,17 @@ Shared templates (under `tasks/`):
 | `fase-3-documentacao.md` | 3 | Documentation (RFC-0002 → completed) |
 | `token-report.md` | — | Token consolidation (RFC-0002), created in phase 3 |
 
+## RFC-0003 — `tasks/rfc-0003/`
+
+| File | Phase | Description |
+|------|-------|-------------|
+| `fase-1-assets.md` | 1 | Branded app icon, adaptive icon, splash icon, favicon (PNG replacement) |
+| `fase-2-appjson.md` | 2 | `app.json` — `expo.backgroundColor`, splash plugin, Android adaptive background (`#F8FAFC`) |
+| `fase-3-validacao.md` | 3 | Device/emulator: `expo run:android`, launcher/splash checks, `expo prebuild` sync to `android/` |
+| `fase-4-documentacao.md` | 4 | RFC → `rfcs/completed/`, Decision Record, `AGENTS`/`README` / `CLAUDE` pointers, `feedback-forward` applied markers |
+
+> Command rows for RFC-0003 phases 1–4 are in `AGENTS.md` §0.
+
 ## Status legend
 
 ```

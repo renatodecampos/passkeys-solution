@@ -1,0 +1,122 @@
+{
+  "workflow_version": "1.2.0",
+  "timestamps": {
+    "started": "2026-04-25T12:00:00.000Z",
+    "last_updated": "2026-04-25T12:00:00.000Z",
+    "completed": "2026-04-25T12:00:00.000Z"
+  },
+  "mode": "initial_scan",
+  "scan_level": "quick",
+  "project_root": "<repo-root>",
+  "project_knowledge": "<repo-root>/docs",
+  "repository_type": "monorepo",
+  "project_types": [
+    {
+      "part_id": "server",
+      "project_type_id": "backend",
+      "display_name": "API / Fastify (passkeys-server)"
+    },
+    {
+      "part_id": "app",
+      "project_type_id": "mobile",
+      "display_name": "Expo / React Native (passkeys-app)"
+    }
+  ],
+  "completed_steps": [
+    {
+      "step": "step_1",
+      "status": "completed",
+      "timestamp": "2026-04-25T12:00:00.000Z",
+      "summary": "Classified as monorepo with 2 parts (server=backend, app=mobile)"
+    },
+    {
+      "step": "step_2",
+      "status": "completed",
+      "timestamp": "2026-04-25T12:00:00.000Z",
+      "summary": "Inventoried existing docs (README, CLAUDE, docs/harness, workflow doc)"
+    },
+    {
+      "step": "step_3",
+      "status": "completed",
+      "timestamp": "2026-04-25T12:00:00.000Z",
+      "summary": "Tech stack from package.json and manifests (Fastify 5, Expo 53, RN 0.79)"
+    },
+    {
+      "step": "step_4",
+      "status": "completed",
+      "timestamp": "2026-04-25T12:00:00.000Z",
+      "summary": "Quick scan: API routes from infra/api index.ts grep; data model from types; no UI component deep read"
+    },
+    {
+      "step": "step_5",
+      "status": "completed",
+      "timestamp": "2026-04-25T12:00:00.000Z",
+      "summary": "source-tree-analysis.md written"
+    },
+    {
+      "step": "step_6",
+      "status": "completed",
+      "timestamp": "2026-04-25T12:00:00.000Z",
+      "summary": "Dev/deployment: docker-compose, npm scripts, CLAUDE.md; no .github/workflows"
+    },
+    {
+      "step": "step_7",
+      "status": "completed",
+      "timestamp": "2026-04-25T12:00:00.000Z",
+      "summary": "integration-architecture.md (HTTPS client to local server)"
+    },
+    {
+      "step": "step_8",
+      "status": "completed",
+      "timestamp": "2026-04-25T12:00:00.000Z",
+      "summary": "Per-part architecture-server and architecture-app"
+    },
+    {
+      "step": "step_9",
+      "status": "completed",
+      "timestamp": "2026-04-25T12:00:00.000Z",
+      "summary": "Supporting docs batch written"
+    },
+    {
+      "step": "step_10",
+      "status": "completed",
+      "timestamp": "2026-04-25T12:00:00.000Z",
+      "summary": "index.md master index"
+    },
+    {
+      "step": "step_11",
+      "status": "completed",
+      "timestamp": "2026-04-25T12:00:00.000Z",
+      "summary": "Validation: no (To be generated) markers required for generated set"
+    },
+    {
+      "step": "step_12",
+      "status": "completed",
+      "timestamp": "2026-04-25T12:00:00.000Z",
+      "summary": "Workflow complete"
+    }
+  ],
+  "current_step": "completed",
+  "findings": {
+    "project_classification": "Monorepo: passkeys-server (Node/Fastify WebAuthn API) + passkeys-app (Expo React Native passkey client).",
+    "technology_stack": {
+      "server": "TypeScript, Fastify 5, SimpleWebAuthn 13, MongoDB driver, Redis (ioredis)",
+      "app": "Expo SDK 53, React 19, React Native 0.79, Expo Router 5, react-native-passkey"
+    },
+    "batches_completed": []
+  },
+  "outputs_generated": [
+    "project-scan-report.json",
+    "project-overview.md",
+    "source-tree-analysis.md",
+    "api-contracts-server.md",
+    "data-models-server.md",
+    "architecture-server.md",
+    "architecture-app.md",
+    "integration-architecture.md",
+    "component-inventory-app.md",
+    "development-guide.md",
+    "index.md"
+  ],
+  "resume_instructions": "Completed; re-run bmad-document-project for rescan or deep-dive"
+}

@@ -1,12 +1,11 @@
 import fetchMock from 'jest-fetch-mock';
 import {
+  API_BASE_URL,
   generateRegistrationOptions,
   verifyRegistration,
   generateAuthenticationOptions,
   verifyAuthentication,
 } from '../api';
-
-const BASE_URL = 'https://localhost:3000';
 
 beforeEach(() => {
   fetchMock.resetMocks();
@@ -20,7 +19,7 @@ describe('generateRegistrationOptions', () => {
     const result = await generateRegistrationOptions('alice');
 
     expect(fetchMock).toHaveBeenCalledWith(
-      `${BASE_URL}/generate-registration-options`,
+      `${API_BASE_URL}/generate-registration-options`,
       expect.objectContaining({
         method: 'POST',
         headers: expect.objectContaining({ 'Content-Type': 'application/json' }),
@@ -40,7 +39,7 @@ describe('verifyRegistration', () => {
     const result = await verifyRegistration('alice', payload);
 
     expect(fetchMock).toHaveBeenCalledWith(
-      `${BASE_URL}/verify-registration`,
+      `${API_BASE_URL}/verify-registration`,
       expect.objectContaining({
         method: 'POST',
         headers: expect.objectContaining({
@@ -62,7 +61,7 @@ describe('generateAuthenticationOptions', () => {
     const result = await generateAuthenticationOptions('alice');
 
     expect(fetchMock).toHaveBeenCalledWith(
-      `${BASE_URL}/generate-authentication-options`,
+      `${API_BASE_URL}/generate-authentication-options`,
       expect.objectContaining({
         method: 'POST',
         headers: expect.objectContaining({
@@ -84,7 +83,7 @@ describe('verifyAuthentication', () => {
     const result = await verifyAuthentication('alice', payload);
 
     expect(fetchMock).toHaveBeenCalledWith(
-      `${BASE_URL}/verify-authentication`,
+      `${API_BASE_URL}/verify-authentication`,
       expect.objectContaining({
         method: 'POST',
         headers: expect.objectContaining({

@@ -45,6 +45,7 @@
       "favicon": "./assets/images/favicon.png"
     },
     "plugins": [
+      "./plugins/withAndroidUserCA.js",
       "expo-router",
       [
         "expo-splash-screen",
@@ -52,9 +53,16 @@
           "image": "./assets/images/splash-icon.png",
           "imageWidth": 200,
           "resizeMode": "contain",
-          "backgroundColor": "#F8FAFC"
+          "backgroundColor": "#F8FAFC",
+          "android": {
+            "image": "./assets/images/splash-android.png",
+            "imageWidth": 288,
+            "resizeMode": "contain"
+          }
         }
-      ]
+      ],
+      "expo-font",
+      "expo-web-browser"
     ],
     "experiments": {
       "typedRoutes": true

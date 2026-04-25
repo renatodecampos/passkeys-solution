@@ -3,9 +3,8 @@
 > Template: copy this file to `tasks/rfc-XXXX/fase-{{NUMERO}}-{{slug}}.md` and fill in fields
 > marked with `{{}}`. Each RFC has its own `tasks/rfc-xxxx/` folder; phase numbers restart at 1.
 >
-> When registering this phase in `tasks/feedback-forward.md`, use the section format:
-> `## RFC-{ID} — {Full RFC title}` (e.g. `## RFC-0003 — My New Initiative`).
-> The full title is in the `title:` field of the RFC file under `rfcs/`.
+> Phase retrospectives go in `tasks/rfc-XXXX/feedback-forward.md` (one file per RFC).
+> Token summary, cross-cutting insights, and context window post-mortems go in `tasks/feedback-forward.md` (central).
 
 **Phase status**: `[ ] pending`  
 **Owning agent**: —  
@@ -137,7 +136,7 @@ _Free form for the agent to record observations during execution._
 ## Feedback Forward
 
 > **Required** — filled by the agent before marking the phase `[x] completed`.  
-> When done, copy relevant insights to `tasks/feedback-forward.md` (cross-RFC log).
+> When done, copy relevant insights to `tasks/rfc-XXXX/feedback-forward.md` (this RFC's log) and update the Token summary in `tasks/feedback-forward.md` (central).
 
 ### What went well
 - 

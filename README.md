@@ -22,7 +22,9 @@ It is also a **structured engineering experiment**: the entire development was o
 
 ## Demo
 
-![Demo — RFC-0002: passkey registration and authentication on Android](demos/demo-rfc-0002.gif)
+**RFC-0003 — Visual identity: app icon, splash screen, Light Clean theme**
+
+![Demo — RFC-0003: visual identity on Android](demos/demo-rfc-0003.gif)
 
 ---
 
@@ -254,6 +256,15 @@ This project was built entirely by AI agents coordinated through a **file-based 
 | 1 | App UX (Calm Card, Home Proof) | ✅ completed |
 | 2 | UX validation and E2E | ✅ completed |
 | 3 | Documentation + RFC in `rfcs/completed/` | ✅ completed |
+
+**RFC-0003** (Visual identity)
+
+| Phase | Description | Status |
+|---|---|---|
+| 1 | Asset generation (icon, splash, adaptive) | ✅ completed |
+| 2 | `app.json` configuration | ✅ completed |
+| 3 | Device validation | ✅ completed |
+| 4 | Documentation | ✅ completed |
 
 ---
 

@@ -31,6 +31,10 @@ The agent opens the matching `tasks/rfc-xxxx/fase-....md` file, reads the **"Orc
 | `/feature-dev execute RFC-0002 phase 1` | `tasks/rfc-0002/fase-1-ux-app.md` |
 | `/feature-dev execute RFC-0002 phase 2` | `tasks/rfc-0002/fase-2-ux-validacao.md` |
 | `/feature-dev execute RFC-0002 phase 3` | `tasks/rfc-0002/fase-3-documentacao.md` |
+| `/feature-dev execute RFC-0003 phase 1` | `tasks/rfc-0003/fase-1-assets.md` |
+| `/feature-dev execute RFC-0003 phase 2` | `tasks/rfc-0003/fase-2-appjson.md` |
+| `/feature-dev execute RFC-0003 phase 3` | `tasks/rfc-0003/fase-3-validacao.md` |
+| `/feature-dev execute RFC-0003 phase 4` | `tasks/rfc-0003/fase-4-documentacao.md` |
 
 > **Note:** On-disk filenames keep the `fase-` prefix; the slash command uses the English keyword `phase`.
 
@@ -246,7 +250,11 @@ Within a phase, some subtasks are independent and can run in parallel. Each phas
 When each phase ends, the orchestrator agent **must** capture what was learned and record it in two places:
 
 1. The `## Feedback Forward` section of the completed phase file
-2. `tasks/feedback-forward.md` (cross-RFC log)
+2. `tasks/rfc-XXXX/feedback-forward.md` — phase retrospective for this RFC (one file per RFC folder)
+
+And update one central file:
+
+3. `tasks/feedback-forward.md` — Token summary row + any new cross-cutting insight or post-mortem (context > 75%)
 
 These feed each RFC’s Documentation phase, which applies improvements to permanent harness files (`AGENTS.md`, `CLAUDE.md`, `_template-fase.md`).
 
@@ -274,7 +282,7 @@ A phase with **3 or more resolved blockers** suggests earlier phase specs had ma
 ### Application process (documentation phase)
 
 The Documentation phase agent for each RFC must:
-1. Read `tasks/feedback-forward.md` in full
+1. Read `tasks/rfc-XXXX/feedback-forward.md` in full (this RFC’s retrospectives)
 2. Apply all lines with `Applied? [ ]` that are high priority
 3. Mark applied lines `[x]` with commit or PR reference
 4. Update `tasks/README.md` if new harness files are created

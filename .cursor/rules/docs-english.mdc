@@ -1,0 +1,10 @@
+---
+description: Documentation language for this repository
+globs: docs/**/*.md
+alwaysApply: false
+---
+
+# Documentation language
+
+- Write and maintain **all** new and updated content under `docs/` in **English**, unless the user explicitly requests another language for a specific file.
+- This matches BMM `document_output_language` / `project_knowledge` in `_bmad/bmm/config.yaml`.

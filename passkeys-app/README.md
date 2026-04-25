@@ -6,6 +6,10 @@
 
 Full setup (Docker, HTTPS with mkcert, `adb reverse`, server env vars, Android fingerprint): [`../CLAUDE.md`](../CLAUDE.md).
 
+## Icon and splash (RFC-0003)
+
+Branded PNGs live in [`assets/images/`](./assets/images/) (`icon`, `adaptive-icon`, `splash-icon`, `favicon`, and Android-specific `splash-android`). `app.json` uses Light Clean background `#F8FAFC` for the app shell, `expo-splash-screen`, and the Android adaptive icon. If you change those assets or splash config and the repo contains a generated [`android/`](./android/) tree, run `npx expo prebuild --platform android` (or a full `npx expo run:android` that runs prebuild) so native `colors.xml`, splash drawables, and mipmaps stay in sync. Spec: [`../rfcs/completed/RFC-0003-visual-identity.md`](../rfcs/completed/RFC-0003-visual-identity.md).
+
 ## Commands
 
 | Command | Purpose |
