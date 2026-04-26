@@ -44,6 +44,7 @@ Shared templates (under `tasks/`):
 | `fase-1-server-audit-binding.md` | 1 | Server: `auth_attempts` + `keystore_binding`, binding challenge, verify payload, Jest |
 | `fase-2-android-keystore.md` | 2 | Android: Keystore key, `api.ts` + entry screen, manual emulator PoC |
 | `fase-3-documentacao.md` | 3 | RFC → `rfcs/completed/`, `CLAUDE.md` / READMEs, `feedback-forward` ✓ |
+| `fase-4-hardening.md` | 4 | Rate limiting, revokedAt binding history, PIN blocking policy |
 | `feedback-forward.md` | — | Per-RFC phase retrospectives (RFC-0004) |
 
 > Command rows: `AGENTS.md` §0 (`/feature-dev execute RFC-0004 phase 1` … `phase 3`).
