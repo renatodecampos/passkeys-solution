@@ -41,6 +41,22 @@ It is also a **structured engineering experiment**: the entire development was o
 
 ---
 
+## Android version requirements for account risk detection (RFC-0004)
+
+This PoC places a hardware-backed key inside the phone and asks the device to sign a challenge on every sign-in. If the key can no longer be used — because a new fingerprint was enrolled since the key was created — the backend receives a `binding=lost` signal and can act on it (block access, require re-verification, etc.).
+
+How reliable that signal is depends on the Android version:
+
+| Android version | What you get |
+|---|---|
+| **7.0 (API 24)** — minimum to run the feature | The alarm exists: adding a new fingerprint invalidates the key and the backend receives the risk signal. Below this version the key is never invalidated and the feature is silent. |
+| **9.0 (API 28)** | The key moves into a **dedicated security chip** (StrongBox) physically separated from the main processor, making key extraction significantly harder even with direct hardware access. Falls back automatically to the processor's own secure area (TEE) if the chip is absent. |
+| **11 (API 30)** — complete guarantee | The key can **only** be unlocked by a strong fingerprint. Device PIN, pattern, and weak face unlock cannot substitute. Below this version an attacker who knows the PIN could bypass the biometric requirement and sign the challenge anyway, making the detection unreliable. |
+
+**Plain-language summary:** the detection signal works from Android 7, but the full guarantee — where knowing the PIN is not enough to fake the proof — only exists from Android 11 onward. Any production policy that relies on this signal should target Android 11+ devices.
+
+---
+
 ## Architecture
 
 ```
