@@ -22,6 +22,10 @@ It is also a **structured engineering experiment**: the entire development was o
 
 ## Demo
 
+**RFC-0004 — Android Keystore binding: biometric enrollment audit**
+
+<video src="demos/demo-rfc-0004.mp4" controls width="320"></video>
+
 **RFC-0003 — Visual identity: app icon, splash screen, Light Clean theme**
 
 ![Demo — RFC-0003: visual identity on Android](demos/demo-rfc-0003.gif)
