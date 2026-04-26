@@ -1,9 +1,9 @@
 # Phase 4 — Hardening (RFC-0004)
 
-**Phase status**: `[ ] pending`  
-**Owning agent**: —  
-**Started at**: —  
-**Completed at**: —
+**Phase status**: `[x] completed`  
+**Owning agent**: claude-sonnet-4-6  
+**Started at**: 2026-04-26T00:00:00Z  
+**Completed at**: 2026-04-26T00:00:00Z
 
 ---
 
@@ -44,7 +44,7 @@ Three hardening items decided 2026-04-26:
 
 ### 4.1 — Rate limiting on `/verify-authentication` (Open Q9)
 
-**Status**: `[ ] pending`  
+**Status**: `[x] completed`  
 **depends_on**: []
 
 **Files:**
@@ -150,7 +150,7 @@ it('within rate limit → proceeds to WebAuthn verify', async () => {
 
 ### 4.2 — Keystore binding history: revokedAt on re-registration (Open Q10)
 
-**Status**: `[ ] pending`  
+**Status**: `[x] completed`  
 **depends_on**: []
 
 **Files:**
@@ -245,7 +245,7 @@ it('registerKeystoreBinding: revokes existing active binding before inserting ne
 
 ### 4.3 — PIN blocking policy (Open Q5/Q6)
 
-**Status**: `[ ] pending`  
+**Status**: `[x] completed`  
 **depends_on**: []
 
 **Files:**
@@ -433,7 +433,7 @@ it('device_credential unlock + authDenyOnBindingPinUnlock → verified false, bl
 
 ### 4.4 — Tests: run full suite
 
-**Status**: `[ ] pending`  
+**Status**: `[x] completed`  
 **depends_on**: [4.1, 4.2, 4.3]
 
 ```bash
@@ -446,7 +446,7 @@ Expected: all suites pass, coverage ≥ 80%.
 
 ### 4.5 — Update docs
 
-**Status**: `[ ] pending`  
+**Status**: `[x] completed`  
 **depends_on**: [4.1, 4.2, 4.3]
 
 **Files:**

@@ -25,6 +25,7 @@ const generateSessionKey = () => {
 
 /** Expected WebAuthn domain errors (client) — not a server failure */
 const httpStatusForAuthDomainError = (err: Error): number => {
+    if (err.message === 'Rate limit exceeded') return 429;
     return err.message === 'User not found' ? 400 : 500;
 };
 
@@ -151,6 +152,7 @@ export const defineEndpoints = (server: FastifyInstance) => {
                 authAttemptId: result.authAttemptId,
                 biometryBindingStatus: result.biometryBindingStatus,
                 suspiciousActivity: result.suspiciousActivity,
+                blockReason: result.blockReason,
             });
         } catch (error) {
             const _error = error as Error;

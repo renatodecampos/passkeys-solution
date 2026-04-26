@@ -1,5 +1,5 @@
-import { getRegistrationOptions, verifyRegistration } from '../index';
-import { getUser, createUser, updateUser } from '../../infra/database/database';
+import { getRegistrationOptions, verifyRegistration, registerKeystoreBinding } from '../index';
+import { getUser, createUser, updateUser, revokeKeystoreBinding, insertKeystoreBinding } from '../../infra/database/database';
 import { redis } from '../../infra/database/redis';
 import { generateRegistrationOptions, verifyRegistrationResponse } from '@simplewebauthn/server';
 import type { RegistrationResponseJSON, WebAuthnCredential } from '@simplewebauthn/server';
@@ -17,6 +17,8 @@ jest.mock('../../infra/logger', () => ({
 const mockGetUser = jest.mocked(getUser);
 const mockCreateUser = jest.mocked(createUser);
 const mockUpdateUser = jest.mocked(updateUser);
+const mockRevokeKeystoreBinding = jest.mocked(revokeKeystoreBinding);
+const mockInsertKeystoreBinding = jest.mocked(insertKeystoreBinding);
 const mockRedisSetex = jest.mocked(redis.setex);
 const mockRedisGet = jest.mocked(redis.get);
 const mockGenerateRegistrationOptions = jest.mocked(generateRegistrationOptions);
@@ -187,5 +189,42 @@ describe('verifyRegistration', () => {
     mockVerifyRegistrationResponse.mockRejectedValue(new Error('Verification failed'));
 
     await expect(verifyRegistration('alice', mockResponse)).rejects.toThrow('Verification failed');
+  });
+});
+
+describe('registerKeystoreBinding', () => {
+  beforeEach(() => {
+    mockRevokeKeystoreBinding.mockResolvedValue(undefined);
+    mockInsertKeystoreBinding.mockResolvedValue(undefined);
+  });
+
+  it('revokes existing binding then inserts new one', async () => {
+    mockGetUser.mockResolvedValue(mockUser);
+    await registerKeystoreBinding('alice', { publicKeySpkiB64: 'c3BraQ==', algorithm: 'P-256' });
+    expect(mockRevokeKeystoreBinding).toHaveBeenCalledWith('user-1');
+    expect(mockInsertKeystoreBinding).toHaveBeenCalledWith(
+      expect.objectContaining({
+        schemaVersion: 1,
+        userId: 'user-1',
+        publicKeySpkiB64: 'c3BraQ==',
+        algorithm: 'P-256',
+      }),
+    );
+  });
+
+  it('revoke is called before insert', async () => {
+    mockGetUser.mockResolvedValue(mockUser);
+    const callOrder: string[] = [];
+    mockRevokeKeystoreBinding.mockImplementation(async () => { callOrder.push('revoke'); });
+    mockInsertKeystoreBinding.mockImplementation(async () => { callOrder.push('insert'); });
+    await registerKeystoreBinding('alice', { publicKeySpkiB64: 'key', algorithm: 'P-256' });
+    expect(callOrder).toEqual(['revoke', 'insert']);
+  });
+
+  it('user not found → throws', async () => {
+    mockGetUser.mockResolvedValue(null);
+    await expect(
+      registerKeystoreBinding('alice', { publicKeySpkiB64: 'x', algorithm: 'P-256' }),
+    ).rejects.toThrow('User not found');
   });
 });

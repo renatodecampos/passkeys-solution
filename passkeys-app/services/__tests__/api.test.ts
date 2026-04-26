@@ -5,6 +5,7 @@ import {
   verifyRegistration,
   generateAuthenticationOptions,
   verifyAuthentication,
+  registerKeystoreBinding,
 } from '../api';
 
 beforeEach(() => {
@@ -94,6 +95,53 @@ describe('verifyAuthentication', () => {
       })
     );
     expect(result).toEqual(mockResponse);
+  });
+
+  it('merges binding and bindingUnlockHint into verify body', async () => {
+    const mockResponse = { verified: true, biometryBindingStatus: 'ok' };
+    const webauthn = { id: 'cred1', type: 'public-key', response: { a: 1 } };
+    fetchMock.mockResponseOnce(JSON.stringify(mockResponse));
+
+    const result = await verifyAuthentication('alice', webauthn, {
+      binding: { challenge: 'bch1', signature: 'sig1=', algorithm: 'ES256' },
+      bindingUnlockHint: 'biometric',
+    });
+
+    expect(JSON.parse((fetchMock.mock.calls[0][1] as { body: string }).body)).toEqual({
+      ...webauthn,
+      binding: { challenge: 'bch1', signature: 'sig1=', algorithm: 'ES256' },
+      bindingUnlockHint: 'biometric',
+    });
+    expect(result).toEqual(mockResponse);
+  });
+
+  it('sends binding status lost', async () => {
+    const mockResponse = { verified: true, biometryBindingStatus: 'lost' };
+    fetchMock.mockResponseOnce(JSON.stringify(mockResponse));
+    const webauthn = { id: 'c', type: 'public-key' };
+    await verifyAuthentication('u', webauthn, { binding: { status: 'lost' } });
+    const body = JSON.parse((fetchMock.mock.calls[0][1] as { body: string }).body);
+    expect(body).toEqual(
+      expect.objectContaining({
+        id: 'c',
+        binding: { status: 'lost' },
+      })
+    );
+  });
+});
+
+describe('registerKeystoreBinding', () => {
+  it('sends POST to register-keystore-binding with public key and algorithm', async () => {
+    fetchMock.mockResponseOnce(JSON.stringify({ ok: true }));
+    await registerKeystoreBinding('alice', { publicKeySpkiB64: 'cGs=', algorithm: 'P-256' });
+    expect(fetchMock).toHaveBeenCalledWith(
+      `${API_BASE_URL}/register-keystore-binding`,
+      expect.objectContaining({
+        method: 'POST',
+        body: JSON.stringify({ publicKeySpkiB64: 'cGs=', algorithm: 'P-256' }),
+        headers: expect.objectContaining({ 'x-username': 'alice' }),
+      })
+    );
   });
 });
 

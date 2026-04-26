@@ -35,6 +35,9 @@ The agent opens the matching `tasks/rfc-xxxx/fase-....md` file, reads the **"Orc
 | `/feature-dev execute RFC-0003 phase 2` | `tasks/rfc-0003/fase-2-appjson.md` |
 | `/feature-dev execute RFC-0003 phase 3` | `tasks/rfc-0003/fase-3-validacao.md` |
 | `/feature-dev execute RFC-0003 phase 4` | `tasks/rfc-0003/fase-4-documentacao.md` |
+| `/feature-dev execute RFC-0004 phase 1` | `tasks/rfc-0004/fase-1-server-audit-binding.md` |
+| `/feature-dev execute RFC-0004 phase 2` | `tasks/rfc-0004/fase-2-android-keystore.md` |
+| `/feature-dev execute RFC-0004 phase 3` | `tasks/rfc-0004/fase-3-documentacao.md` |
 
 > **Note:** On-disk filenames keep the `fase-` prefix; the slash command uses the English keyword `phase`.
 

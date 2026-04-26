@@ -1,5 +1,5 @@
 import { randomBytes } from "node:crypto";
-import { rpID, expectedOrigins, authDenyOnBindingLost, bindingChallengeTtlSeconds } from "../setup"
+import { rpID, expectedOrigins, authDenyOnBindingLost, authDenyOnBindingPinUnlock, bindingChallengeTtlSeconds, authRateLimitMax } from "../setup"
 import { getUser, updateUser, insertAuthAttempt, getKeystoreBindingByUserId } from "../infra/database/database";
 import { AuthenticationResponseJSON, GenerateAuthenticationOptionsOpts, generateAuthenticationOptions, VerifiedAuthenticationResponse, verifyAuthenticationResponse, VerifyAuthenticationResponseOpts, WebAuthnCredential } from "@simplewebauthn/server";
 import { redis } from "../infra/database/redis";
@@ -10,6 +10,7 @@ import { verifySpkiBindingSignature } from "./binding-crypto";
 const challengeKey = (username: string) => `challenge:${username}-authentication`;
 export const bindingChallengeRedisKey = (username: string) =>
     `webauthn-binding-challenge:${username}`;
+const rateLimitKey = (userId: string) => `auth-ratelimit:${userId}`;
 
 export type ClientBindingPayload = {
     challenge?: string;
@@ -29,6 +30,7 @@ export type VerifyAuthResult = {
     authAttemptId: string;
     biometryBindingStatus: string;
     suspiciousActivity: boolean;
+    blockReason?: "binding_lost" | "pin_unlock";
     verification: VerifiedAuthenticationResponse;
 };
 
@@ -51,7 +53,7 @@ export const getAuthenticationOptions = async (username: string) => {
     if (!user) {
         logger.error(`User ${username} not found`);
         throw new Error('User not found');
-    }  
+    }
 
     const opts: GenerateAuthenticationOptionsOpts = {
         timeout: 60000,
@@ -89,8 +91,9 @@ async function evaluateBinding(args: {
     username: string;
     userId: string;
     binding?: ClientBindingPayload;
+    bindingUnlockHint?: "biometric" | "device_credential" | null;
 }): Promise<{ outcome: BindingOutcome; detail?: string }> {
-    const { username, userId, binding } = args;
+    const { username, userId, binding, bindingUnlockHint } = args;
     const stored = await getKeystoreBindingByUserId(userId);
     const expectedB = await redis.get(bindingChallengeRedisKey(username));
 
@@ -136,6 +139,11 @@ async function evaluateBinding(args: {
 
     if (!ok) {
         return { outcome: "error", detail: "invalid_binding_signature" };
+    }
+
+    if (bindingUnlockHint === "device_credential") {
+        await redis.del(bindingChallengeRedisKey(username));
+        return { outcome: "error", detail: "device_credential_not_accepted" };
     }
 
     await redis.del(bindingChallengeRedisKey(username));
@@ -192,6 +200,25 @@ export const verifyAuthentication = async (
         });
         await clearAuthRedisKeys(username);
         throw new Error('Authenticator is not registered with this site');
+    }
+
+    const rateLimitCount = await redis.incr(rateLimitKey(user.id));
+    if (rateLimitCount === 1) {
+        await redis.expire(rateLimitKey(user.id), bindingChallengeTtlSeconds);
+    }
+    if (rateLimitCount > authRateLimitMax) {
+        const _id = await insertAuthAttempt({
+            schemaVersion: AUTH_AUDIT_SCHEMA_VERSION,
+            userId: user.id,
+            createdAt: new Date(),
+            result: "webauthn_failure",
+            errorCode: "rate_limited",
+            credentialId: authenticationResponse.id,
+            bindingOutcome: "skipped",
+            bindingUnlockHint: bindingUnlockHint ?? null,
+        });
+        await clearAuthRedisKeys(username);
+        throw new Error("Rate limit exceeded");
     }
 
     let verification: VerifiedAuthenticationResponse;
@@ -254,7 +281,36 @@ export const verifyAuthentication = async (
         username,
         userId: user.id,
         binding,
+        bindingUnlockHint: bindingUnlockHint ?? null,
     });
+
+    const pinDenied =
+        authDenyOnBindingPinUnlock &&
+        bindingEval.outcome === "error" &&
+        bindingEval.detail === "device_credential_not_accepted";
+
+    if (pinDenied) {
+        const _id = await insertAuthAttempt({
+            schemaVersion: AUTH_AUDIT_SCHEMA_VERSION,
+            userId: user.id,
+            createdAt: new Date(),
+            result: "webauthn_success",
+            errorCode: "auth_denied_pin_unlock",
+            credentialId: authenticationResponse.id,
+            bindingOutcome: "error",
+            bindingErrorDetail: "device_credential_not_accepted",
+            bindingUnlockHint: "device_credential",
+        });
+        await clearAuthRedisKeys(username);
+        return {
+            verified: false,
+            authAttemptId: _id.toHexString(),
+            biometryBindingStatus: toBiometryBindingStatus("error"),
+            suspiciousActivity: false,
+            blockReason: "pin_unlock",
+            verification,
+        };
+    }
 
     const policyDenied =
         authDenyOnBindingLost && bindingEval.outcome === "lost";
@@ -277,6 +333,7 @@ export const verifyAuthentication = async (
             authAttemptId: _id.toHexString(),
             biometryBindingStatus: toBiometryBindingStatus("lost"),
             suspiciousActivity: true,
+            blockReason: "binding_lost",
             verification,
         };
     }

@@ -92,10 +92,42 @@ export async function verifyRegistration(username: string, response: unknown): P
   return postJSON('/verify-registration', response, { 'x-username': username });
 }
 
+export async function registerKeystoreBinding(
+  username: string,
+  body: { publicKeySpkiB64: string; algorithm: 'P-256' | 'Ed25519' }
+): Promise<unknown> {
+  return postJSON('/register-keystore-binding', body, { 'x-username': username });
+}
+
 export async function generateAuthenticationOptions(username: string): Promise<unknown> {
   return postJSON('/generate-authentication-options', {}, { 'x-username': username });
 }
 
-export async function verifyAuthentication(username: string, response: unknown): Promise<unknown> {
-  return postJSON('/verify-authentication', response, { 'x-username': username });
+export type ClientBindingPayload =
+  | { challenge: string; signature: string; algorithm?: string }
+  | { status: 'lost' };
+
+export async function verifyAuthentication(
+  username: string,
+  webauthnResponse: unknown,
+  extras?: {
+    binding?: ClientBindingPayload;
+    bindingUnlockHint?: 'biometric' | 'device_credential' | null;
+  }
+): Promise<unknown> {
+  const hasExtra =
+    extras &&
+    (extras.binding !== undefined || extras.bindingUnlockHint !== undefined);
+  const body = hasExtra
+    ? {
+        ...(typeof webauthnResponse === 'object' && webauthnResponse !== null
+          ? (webauthnResponse as Record<string, unknown>)
+          : {}),
+        ...(extras!.binding !== undefined && { binding: extras!.binding }),
+        ...(extras!.bindingUnlockHint !== undefined && {
+          bindingUnlockHint: extras!.bindingUnlockHint,
+        }),
+      }
+    : webauthnResponse;
+  return postJSON('/verify-authentication', body, { 'x-username': username });
 }

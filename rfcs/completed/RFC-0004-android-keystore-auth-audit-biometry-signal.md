@@ -374,15 +374,21 @@ with `bindingOutcome`, `userId`, `createdAt`, `result`, and `suspiciousActivity`
 | Q5 | PIN vs biometrics for unlock | `bindingUnlockHint: "biometric"` stored in `auth_attempts`; BiometricPrompt configured with `BIOMETRIC_STRONG` only (no device credential in PoC). |
 | Q11 | Schema stability | `schemaVersion: 1` on both `auth_attempts` and `keystore_binding` documents. |
 
+### Open questions resolved (Phase 4 hardening, 2026-04-26)
+
+| # | Question | Resolution |
+|---|----------|-----------|
+| Q9 | Abuse / noise rate limiting | **Resolved** — per-userId rate limit in Redis, 3 attempts per 5-min window (`AUTH_RATE_LIMIT_MAX`). Exceeded → 429 + `auth_attempts` row with `errorCode: "rate_limited"`. |
+| Q10 | Passkey restore / stale `keystore_binding` | **Resolved** — `registerKeystoreBinding` now calls `revokeKeystoreBinding` (sets `revokedAt` on all active rows) then `insertKeystoreBinding`. Active binding = row without `revokedAt`. History is retained. |
+| Q5/Q6 | PIN vs biometrics for unlock / fallback policy | **Resolved (PoC)** — server detects `bindingUnlockHint: "device_credential"` and, when `AUTH_DENY_ON_BINDING_PIN_UNLOCK=true`, returns `verified=false, blockReason="pin_unlock", suspiciousActivity=false`. App shows distinct message. |
+
 ### Open questions deferred
 
 | # | Question | Status |
 |---|----------|--------|
-| Q6 | Fallback policy / accessibility | Deferred — PoC enforces biometric-only; product policy to be decided. |
+| Q6 | Fallback policy / accessibility (production) | Deferred — PoC enforces biometric-only; product policy to be decided for production. |
 | Q7 | Retention and PII | Deferred — local MongoDB only; no automated TTL; document on first production deploy. |
 | Q8 | Ground truth for enrollment change | Partially addressed — manual checklist in `poc-checklist-executed.md`. |
-| Q9 | Abuse / noise rate limiting | Deferred — global Fastify rate limit applies; per-attempt dedupe out of PoC scope. |
-| Q10 | Passkey restore / stale `keystore_binding` | Deferred — `upsertKeystoreBinding` replaces by `userId`; multi-device reconciliation not implemented. |
 
 ### Bugs fixed during execution (not in original RFC scope)
 
@@ -399,5 +405,6 @@ Three Android-layer bugs were found and fixed during phase 2 validation on a phy
 | 1 | `tasks/rfc-0004/fase-1-server-audit-binding.md` |
 | 2 | `tasks/rfc-0004/fase-2-android-keystore.md` |
 | 3 | `tasks/rfc-0004/fase-3-documentacao.md` |
+| 4 | `tasks/rfc-0004/fase-4-hardening.md` |
 
 Brainstorming notes: `_bmad-output/brainstorming/brainstorming-session-2026-04-25-1200.md`

@@ -143,6 +143,8 @@ Copy `.env-example` in `passkeys-server/` before running the server. Required va
 | `ANDROID_CERT_FINGERPRINT`                  | SHA-256 of the Android debug keystore                              |
 | `ANDROID_ORIGIN`                            | Android WebAuthn origin (e.g. `android:apk-key-hash:<base64>`)     |
 | `AUTH_DENY_ON_BINDING_LOST`                 | `true` blocks sign-in when Keystore binding lost (RFC-0004 PoC)   |
+| `AUTH_DENY_ON_BINDING_PIN_UNLOCK`           | `true` blocks sign-in when binding key was unlocked via device PIN instead of biometric (RFC-0004 Phase 4) |
+| `AUTH_RATE_LIMIT_MAX`                       | Max auth attempts per userId per 5-min window before 429 (default `3`) |
 | `AUTH_ATTEMPTS_COLLECTION`                  | MongoDB collection for per-attempt audit log (default `auth_attempts`) |
 | `KEYSTORE_BINDING_COLLECTION`               | MongoDB collection for binding public keys (default `keystore_binding`) |
 | `BINDING_CHALLENGE_TTL_SECONDS`             | TTL for binding challenge in Redis (default `300`)                 |
@@ -167,7 +169,7 @@ Full design in `rfcs/completed/RFC-0004-android-keystore-auth-audit-biometry-sig
 | Collection | Purpose | Schema version |
 |---|---|---|
 | `auth_attempts` | One row per authentication attempt (success + failure). Fields: `userId`, `createdAt`, `result`, `bindingOutcome`, `suspiciousActivity`, `bindingUnlockHint`. | `schemaVersion: 1` |
-| `keystore_binding` | Binding public key registered after passkey creation. Fields: `userId`, `publicKeySpkiB64`, `algorithm`, `createdAt`. Unique index on `userId`. | `schemaVersion: 1` |
+| `keystore_binding` | Binding public key registered after passkey creation. Fields: `userId`, `publicKeySpkiB64`, `algorithm`, `createdAt`, `revokedAt?`. Non-unique index on `userId`; multiple rows allowed (revoked history). Active binding = row without `revokedAt`. | `schemaVersion: 1` |
 
 ### Manual PoC checklist
 

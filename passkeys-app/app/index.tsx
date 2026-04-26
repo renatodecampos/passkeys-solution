@@ -268,7 +268,7 @@ export default function IndexScreen() {
         username.trim(),
         passkeyResponse,
         verifyExtras
-      )) as { verified?: boolean; biometryBindingStatus?: string; suspiciousActivity?: boolean };
+      )) as { verified?: boolean; biometryBindingStatus?: string; suspiciousActivity?: boolean; blockReason?: string };
       if (typeof __DEV__ !== 'undefined' && __DEV__ && verifyResult.biometryBindingStatus) {
         console.log('[keystore] biometryBindingStatus', verifyResult.biometryBindingStatus);
       }
@@ -277,6 +277,14 @@ export default function IndexScreen() {
         setMessage(
           'Access blocked: a new biometric was registered on this device since enrollment. ' +
           'If this was not you, your account may be at risk.'
+        );
+        return;
+      }
+      if (verifyResult.blockReason === 'pin_unlock') {
+        setTone('error');
+        setMessage(
+          'Access blocked: authentication must use biometrics. ' +
+          'Device PIN or pattern is not accepted as binding proof.'
         );
         return;
       }

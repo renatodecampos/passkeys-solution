@@ -19,3 +19,13 @@ export const rateLimitTimeWindow = process.env.RATE_LIMIT_TIME_WINDOW || '1 minu
 export const registrationTimeout = process.env.REGISTRATION_TIMEOUT || 60000;
 export const environment = process.env.NODE_ENV || 'development';
 export const androidCertFingerprint = process.env.ANDROID_CERT_FINGERPRINT || '';
+export const authDenyOnBindingLost = process.env.AUTH_DENY_ON_BINDING_LOST === 'true';
+export const authDenyOnBindingPinUnlock = process.env.AUTH_DENY_ON_BINDING_PIN_UNLOCK === 'true';
+export const authRateLimitMax = Number(process.env.AUTH_RATE_LIMIT_MAX) || 3;
+export const authAttemptsCollectionName =
+  process.env.AUTH_ATTEMPTS_COLLECTION || 'auth_attempts';
+export const keystoreBindingCollectionName =
+  process.env.KEYSTORE_BINDING_COLLECTION || 'keystore_binding';
+export const bindingChallengeTtlSeconds = Number(
+  process.env.BINDING_CHALLENGE_TTL_SECONDS,
+) || 300;

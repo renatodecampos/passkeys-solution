@@ -1,6 +1,7 @@
 import { generateRegistrationOptions, GenerateRegistrationOptionsOpts, RegistrationResponseJSON, verifyRegistrationResponse, WebAuthnCredential } from "@simplewebauthn/server";
 import { rpID, rpName, expectedOrigins, registrationTimeout } from "../setup"
-import { createUser, getUser, updateUser } from "../infra/database/database";
+import { createUser, getUser, updateUser, revokeKeystoreBinding, insertKeystoreBinding } from "../infra/database/database";
+import { KEYSTORE_BINDING_SCHEMA_VERSION } from "../types/auth-audit";
 import { v4 as uuidv4 } from 'uuid';
 import { redis } from "../infra/database/redis";
 import { logger } from "../infra/logger";
@@ -120,4 +121,22 @@ export const verifyRegistration = async (username: string, registrationResponse:
         console.error(_error);
         throw _error;
     }
+};
+
+export const registerKeystoreBinding = async (
+    username: string,
+    input: { publicKeySpkiB64: string; algorithm: "P-256" | "Ed25519" },
+) => {
+    const user = await getUser(username);
+    if (!user) {
+        throw new Error("User not found");
+    }
+    await revokeKeystoreBinding(user.id);
+    await insertKeystoreBinding({
+        schemaVersion: KEYSTORE_BINDING_SCHEMA_VERSION,
+        userId: user.id,
+        publicKeySpkiB64: input.publicKeySpkiB64,
+        algorithm: input.algorithm,
+        createdAt: new Date(),
+    });
 };
