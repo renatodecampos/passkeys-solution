@@ -20,9 +20,16 @@ import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context'
 import {
   generateAuthenticationOptions,
   generateRegistrationOptions,
+  registerKeystoreBinding,
   verifyAuthentication,
   verifyRegistration,
+  type ClientBindingPayload,
 } from '@/services/api';
+import {
+  createKeystoreBindingKey,
+  isKeystoreBindingAvailable,
+  signKeystoreBindingChallenge,
+} from '@/services/keystoreBinding';
 
 const T = {
   bg: '#F8FAFC',
@@ -156,6 +163,21 @@ export default function IndexScreen() {
         username.trim(),
         passkeyResponse
       )) as { verified?: boolean };
+      if (Platform.OS === 'android' && isKeystoreBindingAvailable() && verifyResult.verified) {
+        try {
+          const pub = await createKeystoreBindingKey();
+          if (pub) {
+            await registerKeystoreBinding(username.trim(), {
+              publicKeySpkiB64: pub.publicKeySpkiB64,
+              algorithm: 'P-256',
+            });
+          }
+        } catch (bindErr) {
+          if (typeof __DEV__ !== 'undefined' && __DEV__) {
+            console.warn('[keystore] register binding failed', bindErr);
+          }
+        }
+      }
       setTone('success');
       setMessage('Passkey verified by server.');
       router.replace({
@@ -188,18 +210,72 @@ export default function IndexScreen() {
     setMessage('Contacting server…');
     setTone('loading');
     try {
-      const options = await generateAuthenticationOptions(username.trim());
+      const optionsRaw = (await generateAuthenticationOptions(username.trim())) as Record<string, unknown>;
+      const { bindingChallenge: bindingChallengeField, ...passkeyOptions } = optionsRaw;
+      const bindingChallenge =
+        typeof bindingChallengeField === 'string' ? bindingChallengeField : undefined;
+      if (typeof __DEV__ !== 'undefined' && __DEV__ && Platform.OS === 'android' && isKeystoreBindingAvailable()) {
+        if (!bindingChallenge) {
+          console.log('[keystore] no bindingChallenge in auth options (binding skipped on server path)');
+        }
+      }
+
+      let bindingPayload: ClientBindingPayload | undefined;
+      let bindingUnlockHint: 'biometric' | 'device_credential' | null = null;
+      if (Platform.OS === 'android' && isKeystoreBindingAvailable() && bindingChallenge) {
+        setMessage('Keystore binding sign…');
+        setTone('info');
+        const br = await signKeystoreBindingChallenge(bindingChallenge);
+        if (typeof __DEV__ !== 'undefined' && __DEV__) {
+          if (br.status === 'ok') {
+            console.log('[keystore] sign', { status: 'ok', unlockHint: br.unlockHint });
+          } else if (br.status === 'lost') {
+            console.log('[keystore] sign', { status: 'lost' });
+          } else {
+            console.log('[keystore] sign', { status: br.status, detail: 'message' in br ? br.message : undefined });
+          }
+        }
+        if (br.status === 'ok') {
+          bindingPayload = {
+            challenge: bindingChallenge,
+            signature: br.signature,
+            algorithm: 'ES256',
+          };
+          bindingUnlockHint = br.unlockHint;
+        } else if (br.status === 'lost') {
+          bindingPayload = { status: 'lost' };
+        }
+      }
       setMessage('Android will ask you to confirm with fingerprint, face, or screen lock.');
       setTone('info');
       const passkeyResponse = await Passkey.get(
-        options as Parameters<typeof Passkey.get>[0]
+        passkeyOptions as Parameters<typeof Passkey.get>[0]
       );
       setMessage('Verifying with server…');
       setTone('loading');
+      const verifyExtras =
+        bindingPayload !== undefined || bindingUnlockHint !== null
+          ? {
+              ...(bindingPayload !== undefined && { binding: bindingPayload }),
+              bindingUnlockHint: bindingUnlockHint,
+            }
+          : undefined;
       const verifyResult = (await verifyAuthentication(
         username.trim(),
-        passkeyResponse
-      )) as { verified?: boolean };
+        passkeyResponse,
+        verifyExtras
+      )) as { verified?: boolean; biometryBindingStatus?: string; suspiciousActivity?: boolean };
+      if (typeof __DEV__ !== 'undefined' && __DEV__ && verifyResult.biometryBindingStatus) {
+        console.log('[keystore] biometryBindingStatus', verifyResult.biometryBindingStatus);
+      }
+      if (verifyResult.suspiciousActivity === true) {
+        setTone('error');
+        setMessage(
+          'Access blocked: a new biometric was registered on this device since enrollment. ' +
+          'If this was not you, your account may be at risk.'
+        );
+        return;
+      }
       setTone('success');
       setMessage('Passkey verified by server.');
       router.replace({
@@ -209,6 +285,7 @@ export default function IndexScreen() {
           verified: String(verifyResult.verified === true),
           authMethod: 'passkey',
           responseType: 'JSON',
+          biometryBinding: verifyResult.biometryBindingStatus ?? '',
         },
       });
     } catch (err: unknown) {

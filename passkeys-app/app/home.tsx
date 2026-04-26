@@ -15,11 +15,12 @@ const T = {
 } as const;
 
 export default function HomeScreen() {
-  const { username, verified, authMethod, responseType } = useLocalSearchParams<{
+  const { username, verified, authMethod, responseType, biometryBinding } = useLocalSearchParams<{
     username?: string;
     verified?: string;
     authMethod?: string;
     responseType?: string;
+    biometryBinding?: string;
   }>();
 
   const v = verified === 'true' ? 'true' : (verified ?? '—');
@@ -59,6 +60,24 @@ export default function HomeScreen() {
             <Text style={styles.k}>response type</Text>
             <Text style={styles.v}>{rtype}</Text>
           </View>
+          {biometryBinding ? (
+            <View style={styles.row}>
+              <Text style={styles.k}>binding (PoC)</Text>
+              <Text
+                style={[
+                  styles.v,
+                  biometryBinding === 'ok' && { color: T.success },
+                  biometryBinding === 'lost' && { color: T.error },
+                ]}
+              >
+                {biometryBinding === 'ok'
+                  ? 'ok — keystore intact'
+                  : biometryBinding === 'not_present'
+                  ? 'not present'
+                  : biometryBinding}
+              </Text>
+            </View>
+          ) : null}
         </View>
 
         <Text style={styles.hint}>
