@@ -1,10 +1,50 @@
-import { rpID, expectedOrigins } from "../setup"
-import { getUser, updateUser } from "../infra/database/database";
+import { randomBytes } from "node:crypto";
+import { rpID, expectedOrigins, authDenyOnBindingLost, bindingChallengeTtlSeconds } from "../setup"
+import { getUser, updateUser, insertAuthAttempt, getKeystoreBindingByUserId } from "../infra/database/database";
 import { AuthenticationResponseJSON, GenerateAuthenticationOptionsOpts, generateAuthenticationOptions, VerifiedAuthenticationResponse, verifyAuthenticationResponse, VerifyAuthenticationResponseOpts, WebAuthnCredential } from "@simplewebauthn/server";
 import { redis } from "../infra/database/redis";
 import { logger } from "../infra/logger";
+import { AUTH_AUDIT_SCHEMA_VERSION, BindingOutcome } from "../types/auth-audit";
+import { verifySpkiBindingSignature } from "./binding-crypto";
 
+const challengeKey = (username: string) => `challenge:${username}-authentication`;
+export const bindingChallengeRedisKey = (username: string) =>
+    `webauthn-binding-challenge:${username}`;
 
+export type ClientBindingPayload = {
+    challenge?: string;
+    signature?: string;
+    /** ES256 = P-256; EdDSA = Ed25519 for this PoC */
+    algorithm?: string;
+    status?: "lost";
+};
+
+export type VerifyAuthenticationBody = AuthenticationResponseJSON & {
+    binding?: ClientBindingPayload;
+    bindingUnlockHint?: "biometric" | "device_credential" | null;
+};
+
+export type VerifyAuthResult = {
+    verified: boolean;
+    authAttemptId: string;
+    biometryBindingStatus: string;
+    suspiciousActivity: boolean;
+    verification: VerifiedAuthenticationResponse;
+};
+
+function toBiometryBindingStatus(out: BindingOutcome): string {
+    switch (out) {
+        case "ok": return "ok";
+        case "lost": return "lost";
+        case "not_present": return "not_present";
+        case "error": return "error";
+        case "skipped": return "skipped";
+    }
+}
+
+async function clearAuthRedisKeys(username: string): Promise<void> {
+    await redis.del(challengeKey(username), bindingChallengeRedisKey(username));
+}
 
 export const getAuthenticationOptions = async (username: string) => {
     const user = await getUser(username);
@@ -25,38 +65,98 @@ export const getAuthenticationOptions = async (username: string) => {
     };
 
     const options = await generateAuthenticationOptions(opts);
+    const bindingChallenge = randomBytes(32).toString('base64url');
 
     logger.debug(`Generating authentication options for user ${username}`);
 
-    // Store challenge in Redis with 5-minute expiration
-    await redis.setex(`challenge:${username}-authentication`, 300, options.challenge);
+    await redis.setex(
+        challengeKey(username),
+        bindingChallengeTtlSeconds,
+        options.challenge,
+    );
+    await redis.setex(
+        bindingChallengeRedisKey(username),
+        bindingChallengeTtlSeconds,
+        bindingChallenge,
+    );
 
     logger.debug(`Authentication options generated for user ${username}`);
 
-    return options;
+    return { ...options, bindingChallenge };
 }
 
-export const verifyAuthentication = async (username: string, authenticationResponse: AuthenticationResponseJSON) => {
+async function evaluateBinding(args: {
+    username: string;
+    userId: string;
+    binding?: ClientBindingPayload;
+}): Promise<{ outcome: BindingOutcome; detail?: string }> {
+    const { username, userId, binding } = args;
+    const stored = await getKeystoreBindingByUserId(userId);
+    const expectedB = await redis.get(bindingChallengeRedisKey(username));
+
+    if (binding?.status === "lost") {
+        return { outcome: "lost" };
+    }
+
+    if (!binding?.signature) {
+        return { outcome: "not_present" };
+    }
+
+    if (!binding.challenge) {
+        return { outcome: "error", detail: "binding_challenge_missing" };
+    }
+
+    if (expectedB !== binding.challenge) {
+        return { outcome: "error", detail: "binding_challenge_mismatch" };
+    }
+
+    if (!stored) {
+        return { outcome: "error", detail: "no_stored_binding_key" };
+    }
+
+    const alg: "P-256" | "Ed25519" | null =
+        binding.algorithm === "ES256" || binding.algorithm === "P-256" || (!binding.algorithm && stored.algorithm === "P-256")
+            ? "P-256"
+            : (binding.algorithm === "EdDSA" || (!binding.algorithm && stored.algorithm === "Ed25519") ? "Ed25519" : null);
+
+    if (!alg) {
+        return { outcome: "error", detail: "unsupported_binding_algorithm" };
+    }
+
+    if (alg !== stored.algorithm) {
+        return { outcome: "error", detail: "algorithm_mismatch" };
+    }
+
+    const ok = verifySpkiBindingSignature({
+        publicKeySpkiB64: stored.publicKeySpkiB64,
+        messageUtf8: binding.challenge,
+        signatureB64: binding.signature,
+        algorithm: stored.algorithm,
+    });
+
+    if (!ok) {
+        return { outcome: "error", detail: "invalid_binding_signature" };
+    }
+
+    await redis.del(bindingChallengeRedisKey(username));
+    return { outcome: "ok" };
+}
+
+export const verifyAuthentication = async (
+    username: string,
+    body: VerifyAuthenticationBody,
+): Promise<VerifyAuthResult> => {
+    const { binding, bindingUnlockHint, ...authenticationResponse } = body;
+
     const user = await getUser(username);
     if (!user) {
         logger.error(`User ${username} not found`);
         throw new Error('User not found');
     }
 
-    logger.debug(`Verifying authentication ${JSON.stringify(authenticationResponse)}`);
+    const expectedChallenge = await redis.get(challengeKey(username));
 
-    const expectedChallenge = await redis.get(`challenge:${username}-authentication`);
-
-    if (!expectedChallenge) {
-        logger.error(`No challenge found or challenge expired for user ${username}`);
-        throw new Error('No challenge found or challenge expired');
-    } else {
-        logger.debug(`Expected challenge: ${expectedChallenge}`);
-    }
-
-    // Find existing credential by ID
     let dbCredential: WebAuthnCredential | undefined;
-    // "Query the DB" here for a credential matching `cred.id`
     for (const cred of user.credentials) {
         if (cred.id === authenticationResponse.id) {
             dbCredential = cred;
@@ -64,14 +164,35 @@ export const verifyAuthentication = async (username: string, authenticationRespo
         }
     }
 
-    if (!dbCredential) {
-        logger.error(`Authenticator is not registered with this site for user ${username}`);
-        throw new Error('Authenticator is not registered with this site');
+    if (!expectedChallenge) {
+        const _id = await insertAuthAttempt({
+            schemaVersion: AUTH_AUDIT_SCHEMA_VERSION,
+            userId: user.id,
+            createdAt: new Date(),
+            result: "webauthn_failure",
+            errorCode: "no_challenge",
+            credentialId: authenticationResponse.id,
+            bindingOutcome: "skipped",
+            bindingUnlockHint: bindingUnlockHint ?? null,
+        });
+        await clearAuthRedisKeys(username);
+        throw new Error('No challenge found or challenge expired');
     }
 
-    logger.debug(`DB credential: ${JSON.stringify(dbCredential)}`);
-
-    logger.debug(`Verifying authentication for user ${username}`);
+    if (!dbCredential) {
+        const _id = await insertAuthAttempt({
+            schemaVersion: AUTH_AUDIT_SCHEMA_VERSION,
+            userId: user.id,
+            createdAt: new Date(),
+            result: "webauthn_failure",
+            errorCode: "credential_not_registered",
+            credentialId: authenticationResponse.id,
+            bindingOutcome: "skipped",
+            bindingUnlockHint: bindingUnlockHint ?? null,
+        });
+        await clearAuthRedisKeys(username);
+        throw new Error('Authenticator is not registered with this site');
+    }
 
     let verification: VerifiedAuthenticationResponse;
     try {
@@ -88,25 +209,99 @@ export const verifyAuthentication = async (username: string, authenticationRespo
             },
             requireUserVerification: false,
         };
-        
-        logger.debug(`Verification opts: ${JSON.stringify(opts)}`);
 
         verification = await verifyAuthenticationResponse(opts);
-        logger.debug(`Verification result: ${JSON.stringify(verification)}`);
     } catch (error) {
         const _error = error as Error;
         logger.error(`Error verifying authentication for user ${username}: ${_error.message}`);
+        await insertAuthAttempt({
+            schemaVersion: AUTH_AUDIT_SCHEMA_VERSION,
+            userId: user.id,
+            createdAt: new Date(),
+            result: "webauthn_failure",
+            errorCode: _error.message.slice(0, 200),
+            credentialId: authenticationResponse.id,
+            bindingOutcome: "skipped",
+            bindingUnlockHint: bindingUnlockHint ?? null,
+        });
+        await clearAuthRedisKeys(username);
         throw _error;
     }
 
     const { verified, authenticationInfo } = verification;
-
-    if (verified && authenticationInfo && dbCredential) {
-        logger.info(`Updating credential counter for user ${username}`);
-        dbCredential.counter = authenticationInfo?.newCounter;
-        await updateUser(user.id, { credentials: user.credentials });
-        logger.info(`Authentication verified for user ${username}`);
+    if (!verified || !authenticationInfo) {
+        const _id = await insertAuthAttempt({
+            schemaVersion: AUTH_AUDIT_SCHEMA_VERSION,
+            userId: user.id,
+            createdAt: new Date(),
+            result: "webauthn_failure",
+            errorCode: "webauthn_not_verified",
+            credentialId: authenticationResponse.id,
+            bindingOutcome: "skipped",
+            bindingUnlockHint: bindingUnlockHint ?? null,
+        });
+        await clearAuthRedisKeys(username);
+        return {
+            verified: false,
+            authAttemptId: _id.toHexString(),
+            biometryBindingStatus: toBiometryBindingStatus("skipped"),
+            suspiciousActivity: false,
+            verification,
+        };
     }
 
-    return verification;
+    const bindingEval = await evaluateBinding({
+        username,
+        userId: user.id,
+        binding,
+    });
+
+    const policyDenied =
+        authDenyOnBindingLost && bindingEval.outcome === "lost";
+
+    if (policyDenied) {
+        const _id = await insertAuthAttempt({
+            schemaVersion: AUTH_AUDIT_SCHEMA_VERSION,
+            userId: user.id,
+            createdAt: new Date(),
+            result: "webauthn_success",
+            errorCode: "auth_denied_binding_lost",
+            credentialId: authenticationResponse.id,
+            bindingOutcome: "lost",
+            bindingErrorDetail: undefined,
+            bindingUnlockHint: bindingUnlockHint ?? null,
+        });
+        await clearAuthRedisKeys(username);
+        return {
+            verified: false,
+            authAttemptId: _id.toHexString(),
+            biometryBindingStatus: toBiometryBindingStatus("lost"),
+            suspiciousActivity: true,
+            verification,
+        };
+    }
+
+    const _id = await insertAuthAttempt({
+        schemaVersion: AUTH_AUDIT_SCHEMA_VERSION,
+        userId: user.id,
+        createdAt: new Date(),
+        result: "webauthn_success",
+        credentialId: authenticationResponse.id,
+        bindingOutcome: bindingEval.outcome,
+        bindingErrorDetail: bindingEval.detail,
+        bindingUnlockHint: bindingUnlockHint ?? null,
+    });
+
+    dbCredential.counter = authenticationInfo.newCounter;
+    await updateUser(user.id, { credentials: user.credentials });
+
+    await clearAuthRedisKeys(username);
+
+    return {
+        verified: true,
+        authAttemptId: _id.toHexString(),
+        biometryBindingStatus: toBiometryBindingStatus(bindingEval.outcome),
+        suspiciousActivity: false,
+        verification,
+    };
 }

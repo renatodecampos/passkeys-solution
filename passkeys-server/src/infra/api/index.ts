@@ -4,10 +4,9 @@ import cors from '@fastify/cors';
 import rateLimit from '@fastify/rate-limit';
 import fastifySession from '@fastify/session';
 import fastifyCookie from '@fastify/cookie';
-import { getRegistrationOptions, verifyRegistration } from "../../registration";
+import { getRegistrationOptions, verifyRegistration, registerKeystoreBinding } from "../../registration";
 import { AuthenticationResponseJSON, RegistrationResponseJSON } from "@simplewebauthn/server";
-import { getAuthenticationOptions, verifyAuthentication } from "../../authentication";
-import { redis } from "../database/redis";
+import { getAuthenticationOptions, verifyAuthentication, type VerifyAuthenticationBody } from "../../authentication";
 import crypto from 'crypto';
 import { sessionKey, rateLimitMax, rateLimitTimeWindow, environment, androidCertFingerprint } from "../../setup";
 
@@ -111,6 +110,28 @@ export const defineEndpoints = (server: FastifyInstance) => {
     /**
      * Verify Authentication (a.k.a. "Verify Authentication")
      */
+    server.post('/register-keystore-binding', async (request: FastifyRequest, reply: FastifyReply) => {
+        try {
+            const username = request.headers['x-username'] as string;
+            if (!username) {
+                throw new Error('Username is required in the header x-username');
+            }
+            const body = request.body as { publicKeySpkiB64: string; algorithm: 'P-256' | 'Ed25519' };
+            if (!body?.publicKeySpkiB64) {
+                throw new Error('publicKeySpkiB64 is required');
+            }
+            const algorithm = body.algorithm || 'P-256';
+            if (algorithm !== 'P-256' && algorithm !== 'Ed25519') {
+                throw new Error('algorithm must be P-256 or Ed25519');
+            }
+            await registerKeystoreBinding(username, { publicKeySpkiB64: body.publicKeySpkiB64, algorithm });
+            reply.send({ ok: true });
+        } catch (error) {
+            const _error = error as Error;
+            reply.status(httpStatusForAuthDomainError(_error)).send({ error: _error.message });
+        }
+    });
+
     server.post('/verify-authentication', async (request: FastifyRequest, reply: FastifyReply) => {
         try {
             const username = request.headers['x-username'] as string;
@@ -119,13 +140,15 @@ export const defineEndpoints = (server: FastifyInstance) => {
                 throw new Error('Username is required in the header x-username');
             }
 
-            const authenticationResponse = request.body as AuthenticationResponseJSON;
-            const verified = await verifyAuthentication(username, authenticationResponse);
+            const body = request.body as VerifyAuthenticationBody;
+            const result = await verifyAuthentication(username, body);
 
-            // Delete the challenge after use
-            await redis.del(`challenge:${username}-authentication`);
-
-            reply.send({ verified });
+            reply.send({
+                verified: result.verified,
+                authAttemptId: result.authAttemptId,
+                biometryBindingStatus: result.biometryBindingStatus,
+                suspiciousActivity: result.suspiciousActivity,
+            });
         } catch (error) {
             const _error = error as Error;
             reply.status(httpStatusForAuthDomainError(_error)).send({ error: _error.message });
