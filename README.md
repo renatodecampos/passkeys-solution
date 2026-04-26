@@ -22,8 +22,6 @@ It is also a **structured engineering experiment**: the entire development was o
 
 ## Demo
 
-<video src="demos/demo-rfc-0004.mp4" controls width="320"></video>
-
 ![Demo — RFC-0004: Android Keystore binding: biometric enrollment audit](demos/demo-rfc-0004.gif)
 
 ---
