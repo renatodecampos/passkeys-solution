@@ -259,6 +259,17 @@ class KeystoreBindingModule(private val reactContext: ReactApplicationContext) :
     data: ByteArray,
     promise: Promise
   ) {
+    act.runOnUiThread {
+      runBiometricPromptOnUiThread(act, signature, data, promise)
+    }
+  }
+
+  private fun runBiometricPromptOnUiThread(
+    act: FragmentActivity,
+    signature: Signature,
+    data: ByteArray,
+    promise: Promise
+  ) {
     val crypto = BiometricPrompt.CryptoObject(signature)
     val executor = ContextCompat.getMainExecutor(reactContext)
     // Matches createKey: strong biometric only (no device-credential-only unlock for this op).
