@@ -37,6 +37,23 @@ Shared templates (under `tasks/`):
 
 > Command rows for RFC-0003 phases 1–4 are in `AGENTS.md` §0.
 
+## RFC-0004 — `tasks/rfc-0004/`
+
+| File | Phase | Description |
+|------|-------|-------------|
+| `fase-1-server-audit-binding.md` | 1 | Server: `auth_attempts` + `keystore_binding`, binding challenge, verify payload, Jest |
+| `fase-2-android-keystore.md` | 2 | Android: Keystore key, `api.ts` + entry screen, manual emulator PoC |
+| `fase-3-documentacao.md` | 3 | RFC → `rfcs/completed/`, `CLAUDE.md` / READMEs, `feedback-forward` ✓ |
+| `feedback-forward.md` | — | Per-RFC phase retrospectives (RFC-0004) |
+
+> Command rows: `AGENTS.md` §0 (`/feature-dev execute RFC-0004 phase 1` … `phase 3`).
+
+**RFC-0004 status: COMPLETED** — H1 and H2 confirmed on physical device (Samsung SM-A165M, API 36, 2026-04-26). See `rfcs/completed/RFC-0004-android-keystore-auth-audit-biometry-signal.md`.
+
+**Plan RFC:** `rfcs/draft/RFC-0004-android-keystore-auth-audit-biometry-signal.md` (moves to `rfcs/completed/` in phase 3)
+
+Harness text is aligned with RFC **Success metrics**, **PoC limitations**, and **Open questions (1–11)** — see **Prerequisite / RFC alignment** in `fase-1` and completion notes in `fase-2` / `fase-3`.
+
 ## Status legend
 
 ```

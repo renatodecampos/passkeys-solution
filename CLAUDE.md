@@ -142,6 +142,10 @@ Copy `.env-example` in `passkeys-server/` before running the server. Required va
 | `SESSION_SECRET`                            | Secure cookie signing                                              |
 | `ANDROID_CERT_FINGERPRINT`                  | SHA-256 of the Android debug keystore                              |
 | `ANDROID_ORIGIN`                            | Android WebAuthn origin (e.g. `android:apk-key-hash:<base64>`)     |
+| `AUTH_DENY_ON_BINDING_LOST`                 | `true` blocks sign-in when Keystore binding lost (RFC-0004 PoC)   |
+| `AUTH_ATTEMPTS_COLLECTION`                  | MongoDB collection for per-attempt audit log (default `auth_attempts`) |
+| `KEYSTORE_BINDING_COLLECTION`               | MongoDB collection for binding public keys (default `keystore_binding`) |
+| `BINDING_CHALLENGE_TTL_SECONDS`             | TTL for binding challenge in Redis (default `300`)                 |
 
 
 To obtain `ANDROID_CERT_FINGERPRINT`:
@@ -152,6 +156,40 @@ keytool -list -v \
   -alias androiddebugkey -storepass android -keypass android
 # Copy the SHA-256 value: AA:BB:CC:...
 ```
+
+## Keystore binding PoC (RFC-0004)
+
+Android-only feature that detects biometric enrollment changes using an app-managed Keystore key.
+Full design in `rfcs/completed/RFC-0004-android-keystore-auth-audit-biometry-signal.md`.
+
+### MongoDB collections
+
+| Collection | Purpose | Schema version |
+|---|---|---|
+| `auth_attempts` | One row per authentication attempt (success + failure). Fields: `userId`, `createdAt`, `result`, `bindingOutcome`, `suspiciousActivity`, `bindingUnlockHint`. | `schemaVersion: 1` |
+| `keystore_binding` | Binding public key registered after passkey creation. Fields: `userId`, `publicKeySpkiB64`, `algorithm`, `createdAt`. Unique index on `userId`. | `schemaVersion: 1` |
+
+### Manual PoC checklist
+
+**Healthy scenario** (`binding=ok`):
+
+1. Start server with `AUTH_DENY_ON_BINDING_LOST=true` in `.env`
+2. Register a passkey (one fingerprint enrolled on device)
+3. Sign in → backend logs `binding=ok suspicious=false` → home screen shows `ok — keystore intact` in green
+
+**Suspicious scenario** (`binding=lost`):
+
+1. After registering, go to Settings → Biometrics → add a second fingerprint
+2. Sign in → backend logs `binding=lost suspicious=true verified=false`
+3. App shows: *"Access blocked: a new biometric was registered on this device since enrollment."*
+
+### PoC limitations
+
+- `binding_lost` ≠ proof of attacker. A legitimate user adding their own second fingerprint triggers the same outcome.
+- The binding key is unlocked by strong biometrics (`BIOMETRIC_STRONG`). Device PIN fallback is disabled in this PoC.
+- Evidence gathered on emulator may not generalize to all OEM/API combinations (see RFC Decision Record).
+- `auth_attempts` can accumulate noise from failed attempts and tests; high row count alone is not a security signal.
+- No automated TTL on `auth_attempts` — for local research MongoDB only. Define retention policy before production use.
 
 ## Tests
 
@@ -186,9 +224,13 @@ This project uses agent-assisted execution with state tracked in files:
 - `tasks/rfc-0003/fase-2-appjson.md` — `app.json` Light Clean + splash (RFC-0003)
 - `tasks/rfc-0003/fase-3-validacao.md` — device / prebuild validation (RFC-0003)
 - `tasks/rfc-0003/fase-4-documentacao.md` — RFC-0003 documentation close-out
+- `tasks/rfc-0004/fase-1-server-audit-binding.md` — server: auth_attempts, keystore_binding, binding verify (RFC-0004)
+- `tasks/rfc-0004/fase-2-android-keystore.md` — Android Keystore native module + client payload (RFC-0004)
+- `tasks/rfc-0004/fase-3-documentacao.md` — RFC-0004 documentation close-out
 - `rfcs/completed/RFC-0001-passkeys-poc-completion.md` — base plan
 - `rfcs/completed/RFC-0002-ux-passkeys-poc.md` — UX evolution (completed)
 - `rfcs/completed/RFC-0003-visual-identity.md` — app icon, splash, Light Clean (completed)
+- `rfcs/completed/RFC-0004-android-keystore-auth-audit-biometry-signal.md` — Keystore binding PoC (completed)
 
 Phases are sequential. Within a phase, subtasks with no dependency may run in parallel.  
 See `tasks/README.md` for the status legend.
