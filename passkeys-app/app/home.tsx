@@ -86,7 +86,10 @@ export default function HomeScreen() {
         </Text>
 
         <Pressable
-          onPress={() => router.replace('/')}
+          onPress={() => {
+            console.log('[home] logout pressed', { username });
+            router.replace('/');
+          }}
           style={({ pressed }) => [styles.logout, pressed && { opacity: 0.9 }]}
           accessibilityLabel="Log out and return to sign in"
         >

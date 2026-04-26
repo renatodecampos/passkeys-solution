@@ -9,6 +9,7 @@ import { AuthenticationResponseJSON, RegistrationResponseJSON } from "@simpleweb
 import { getAuthenticationOptions, verifyAuthentication, type VerifyAuthenticationBody } from "../../authentication";
 import crypto from 'crypto';
 import { sessionKey, rateLimitMax, rateLimitTimeWindow, environment, androidCertFingerprint } from "../../setup";
+import { logger } from "../logger";
 
 // Define session interface
 declare module '@fastify/session' {
@@ -142,6 +143,8 @@ export const defineEndpoints = (server: FastifyInstance) => {
 
             const body = request.body as VerifyAuthenticationBody;
             const result = await verifyAuthentication(username, body);
+
+            logger.info(`[sign-in] user=${username} verified=${result.verified} binding=${result.biometryBindingStatus} suspicious=${result.suspiciousActivity} attemptId=${result.authAttemptId}`);
 
             reply.send({
                 verified: result.verified,
