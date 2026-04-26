@@ -340,7 +340,9 @@ class KeystoreBindingModule(private val reactContext: ReactApplicationContext) :
       .setTitle("Confirm it’s you")
       .setSubtitle("Binding proof (PoC)")
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-      infoBuilder.setAllowedAuthenticators(allowed)
+      infoBuilder
+        .setAllowedAuthenticators(allowed)
+        .setNegativeButtonText("Cancel")
     } else {
       @Suppress("DEPRECATION")
       infoBuilder
