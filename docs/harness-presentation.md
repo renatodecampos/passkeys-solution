@@ -362,6 +362,74 @@ new-project/
 - Identify the next product candidate to use this harness
 - Estimated onboarding: 1h setup + 1h RFC writing
 
+---
+
+### How long each phase took — wall-clock from task files (all completed RFCs)
+
+Each phase file stores **`Started at`** and **`Completed at`**. Below: **elapsed time between those timestamps** in `tasks/rfc-xxxx/` (not token counts). Token numbers live in [`tasks/feedback-forward.md`](../tasks/feedback-forward.md) when filled in.
+
+**Caveat:** If timestamps were backfilled, rounded to midnight, or only the **date** was recorded, duration is **not** reliable; those rows are marked. Use them as *order-of-magnitude planning hints*, not billing data.
+
+#### RFC-0001 — Passkeys PoC (baseline harness)
+
+| Phase | Focus | Recorded duration | Notes |
+|-------|--------|-------------------|--------|
+| **1** | Server + HTTPS + Docker + certs | **~9h 48m** | First vertical slice. Long pole is normal when nothing exists yet. |
+| **1b** | Server unit tests (Jest) | **~20m** | Narrow scope, parallel subtasks. |
+| **2** | Android app + prebuild + passkey UI | **~30m** | BATCH parallelism in the status file. |
+| **3** | Emulator CA, E2E, integration | **~45m** | Manual emulator steps; spec gaps often surface here. |
+| **4** | Docs + `CLAUDE.md` + feedback | **~30m** | Consolidation. |
+
+*RFC-0001 token rows were not reported in `feedback-forward.md`.* **Phases 1b→4 same calendar day (afternoon):** **~2h 5m** sum of the four durations above.
+
+---
+
+#### RFC-0002 — App UX (Calm Card, home proof)
+
+[`tasks/rfc-0002/`](../tasks/rfc-0002/)
+
+| Phase | Focus | Recorded duration | Notes |
+|-------|--------|-------------------|--------|
+| **1** | UX in `app/index.tsx` + `home.tsx` | **~30m** | |
+| **2** | Validation + E2E / device checks | **~18h** | Timestamps `2026-04-25T18:00Z` → `2026-04-26T12:00Z` — **spans overnight**; treat as “multi-session block,” not a single sitting. |
+| **3** | Documentation close-out | **~2h** | |
+
+*Tokens in `feedback-forward`:* ~78.6k (ph1) + ~109k (ph2) + ~75.3k (ph3).
+
+---
+
+#### RFC-0003 — Visual identity (icon, splash, `app.json`)
+
+[`tasks/rfc-0003/`](../tasks/rfc-0003/)
+
+| Phase | Focus | Recorded duration | Notes |
+|-------|--------|-------------------|--------|
+| **1** | Branded assets (PNGs) | **~30m** | |
+| **2** | `app.json` / Light Clean + splash | **~5m** | |
+| **3** | Prebuild + device validation | **~20m** | |
+| **4** | Documentation + harness lines | **~30m** | |
+
+*Per-file times sum to **~1h 25m**;* calendar order of work may differ if headers were backfilled. *Tokens:* ~60k + ~51.5k + ~172k (86% context — see post-mortem in `feedback-forward.md`) + ~73.9k.
+
+---
+
+#### RFC-0004 — Keystore binding auth audit (server + Android)
+
+[`tasks/rfc-0004/`](../tasks/rfc-0004/)
+
+| Phase | Focus | Recorded duration | Notes |
+|-------|--------|-------------------|--------|
+| **1** | Server: `auth_attempts`, binding verify, flags | **—** | `Completed at` is date-only; **not computable** from the header. *~113k tokens* reported in `feedback-forward` for phase 1. |
+| **2** | Android native module + `api.ts` + manual PoC | **—** | `Completed at` is date-only (`2026-04-26`); start is “(approx.)”. |
+| **3** | Documentation close-out | **~15m** | |
+| **4** | Hardening + final docs | **—** | `Started at` and `Completed at` both `2026-04-26T00:00:00Z` — **placeholder**; use phase Notes, not the header, for this one. |
+
+*Lesson:* tight timestamps matter when you want this slide; **ISO end times** beat date-only `Completed at` fields.
+
+---
+
+> **Speaker note:** *"We did not time this with a stopwatch. The harness records start/end; Phase 1 of a new area still dominates. When the log is sloppy, the table says so — that is also data."*
+
 > *Which team project today suffers most from coordination loss and context drift between sessions?*
 
 ---
