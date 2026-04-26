@@ -96,7 +96,7 @@ cd passkeys-app
 npx expo run:android   # Build and install on emulator/device (expo-dev-client, not Expo Go)
 npm start              # Expo dev server (no native build)
 npm run lint           # ESLint (app package.json script invokes the binary in node_modules)
-npm test               # Jest (services/api.ts)
+npm test               # Jest (services/__tests__/)
 ```
 
 ## Architecture
@@ -106,18 +106,23 @@ npm test               # Jest (services/api.ts)
 Layered architecture: API routes → Business logic → Infrastructure
 
 ```
-index.ts                    # Entry: initializes Fastify, MongoDB, Redis
-setup/index.ts              # Environment config loader
-types/index.ts              # UserModel type
-registration/index.ts       # getRegistrationOptions, verifyRegistration
-authentication/index.ts     # getAuthenticationOptions, verifyAuthentication
-infra/api/index.ts          # Fastify routes, security middleware (Helmet, CORS, rate limiting)
-infra/database/database.ts  # MongoDB CRUD operations
-infra/database/redis.ts     # Redis client (challenge storage with 5-min TTL)
-infra/logger.ts             # Winston logger
+index.ts                              # Entry: initializes Fastify, MongoDB, Redis
+setup/index.ts                        # Environment config loader
+types/index.ts                        # UserModel type
+types/auth-audit.ts                   # AuthAttemptModel, KeystoreBindingModel, BindingOutcome
+registration/index.ts                 # getRegistrationOptions, verifyRegistration, registerKeystoreBinding
+authentication/index.ts               # getAuthenticationOptions, verifyAuthentication
+authentication/binding-crypto.ts      # verifySpkiBindingSignature (P-256 / Ed25519 SPKI)
+infra/api/index.ts                    # Fastify routes, security middleware (Helmet, CORS, rate limiting)
+infra/database/database.ts            # MongoDB CRUD operations
+infra/database/redis.ts               # Redis client (challenge storage)
+infra/interceptors/request-logger.ts  # Fastify onRequest/onResponse/onError hooks
+infra/logger.ts                       # Winston logger
 ```
 
 **WebAuthn flow:** Client request → Fastify route → registration/authentication module → MongoDB (user/credential persistence) + Redis (temporary challenge storage)
+
+> For the full module inventory, exported symbols, Redis key registry, and HTTP endpoint contract see `AGENTS.md §9`.
 
 ### App (`passkeys-app/app/`)
 
@@ -126,8 +131,14 @@ File-based routing via Expo Router (similar to Next.js):
 - `_layout.tsx` — root Stack + Theme layout
 - `index.tsx` — public entry (Calm Card, register/sign in with passkey — RFC-0002)
 - `home.tsx` — authenticated screen (Home Proof: short server verification)
-- `(tabs)/` — tab group (e.g. explore); passkey flow uses `/` and `/home`
+- `second.tsx`, `third.tsx` — reserved PoC screens; not part of the passkey flow
+- `(tabs)/` — tab group (e.g. explore); passkey flow uses `/` and `/home` only
 - Path alias `@/`* maps to project root
+
+Services:
+
+- `services/api.ts` — all HTTP calls to the server (single `fetch` boundary)
+- `services/keystoreBinding.ts` — Android Keystore native bridge (RFC-0004)
 
 ## Environment variables
 
@@ -168,7 +179,7 @@ Full design in `rfcs/completed/RFC-0004-android-keystore-auth-audit-biometry-sig
 
 | Collection | Purpose | Schema version |
 |---|---|---|
-| `auth_attempts` | One row per authentication attempt (success + failure). Fields: `userId`, `createdAt`, `result`, `bindingOutcome`, `suspiciousActivity`, `bindingUnlockHint`. | `schemaVersion: 1` |
+| `auth_attempts` | One row per authentication attempt (success + failure). Fields: `userId`, `createdAt`, `result`, `errorCode?`, `credentialId?`, `bindingOutcome`, `bindingErrorDetail?`, `bindingUnlockHint?`. Note: `suspiciousActivity` is **not** stored — it is derived at runtime in `verifyAuthentication`. | `schemaVersion: 1` |
 | `keystore_binding` | Binding public key registered after passkey creation. Fields: `userId`, `publicKeySpkiB64`, `algorithm`, `createdAt`, `revokedAt?`. Non-unique index on `userId`; multiple rows allowed (revoked history). Active binding = row without `revokedAt`. | `schemaVersion: 1` |
 
 ### Manual PoC checklist

@@ -291,3 +291,123 @@ The Documentation phase agent for each RFC must:
 4. Update `tasks/README.md` if new harness files are created
 
 ---
+
+## 9. Architecture inventory
+
+Reference section. Read before adding files, Redis keys, types, or HTTP endpoints. **Do not invent names or files that already exist here.**
+
+---
+
+### 9.1 Server module map (`passkeys-server/src/`)
+
+| File | Exported symbols | Rule |
+|------|-----------------|------|
+| `index.ts` | _(entry point, not imported)_ | Calls `defineSecurity`, `defineEndpoints`, `registerRequestLogger`, `connectMongoDB`, `connectRedis` |
+| `setup/index.ts` | `rpID`, `rpName`, `expectedOrigin`, `expectedOrigins`, `port`, `host`, `redisUrl`, `mongodbUri`, `dbName`, `collectionName`, `sessionKey`, `logLevel`, `rateLimitMax`, `rateLimitTimeWindow`, `registrationTimeout`, `environment`, `androidCertFingerprint`, `authDenyOnBindingLost`, `authDenyOnBindingPinUnlock`, `authRateLimitMax`, `authAttemptsCollectionName`, `keystoreBindingCollectionName`, `bindingChallengeTtlSeconds` | Only source of env values — never read `process.env` elsewhere |
+| `types/index.ts` | `UserModel` | Core domain type; `credentials: WebAuthnCredential[]` |
+| `types/auth-audit.ts` | `AuthAttemptModel`, `KeystoreBindingModel`, `BindingOutcome`, `WebAuthnAttemptResult`, `BindingAlgorithm`, `AUTH_AUDIT_SCHEMA_VERSION`, `KEYSTORE_BINDING_SCHEMA_VERSION` | Extend these types; do not define parallel audit types |
+| `registration/index.ts` | `getRegistrationOptions(username)`, `verifyRegistration(username, body)`, `registerKeystoreBinding(username, { publicKeySpkiB64, algorithm })` | Also owns keystore binding registration; do not move to api |
+| `authentication/index.ts` | `getAuthenticationOptions(username)`, `verifyAuthentication(username, body)`, `VerifyAuthenticationBody`, `VerifyAuthResult`, `ClientBindingPayload`, `bindingChallengeRedisKey(username)` | Auth rate-limit and binding evaluation live here |
+| `authentication/binding-crypto.ts` | `verifySpkiBindingSignature({ publicKeySpkiB64, messageUtf8, signatureB64, algorithm })` | All SPKI signature verification; do not inline crypto in `authentication/index.ts` |
+| `infra/api/index.ts` | `defineEndpoints(server)`, `defineSecurity(server)` | Thin controller only — no business logic |
+| `infra/database/database.ts` | `connectMongoDB()`, `disconnectMongoDB()`, `getUser(username)`, `createUser(user)`, `updateUser(userId, partial)`, `addCredential(userId, cred)`, `insertAuthAttempt(doc)`, `getKeystoreBindingByUserId(userId)`, `revokeKeystoreBinding(userId)`, `insertKeystoreBinding(doc)` | All MongoDB operations; do not add new Mongo calls elsewhere |
+| `infra/database/redis.ts` | `redis` (ioredis client), `connectRedis()`, `disconnectRedis()` | Redis client singleton |
+| `infra/database/index.ts` | _(empty — do not add barrel re-exports)_ | Direct imports from `database.ts` and `redis.ts` are the pattern |
+| `infra/logger.ts` | `logger` | Winston instance; use everywhere instead of `console.log` |
+| `infra/interceptors/request-logger.ts` | `registerRequestLogger(server)` | Fastify `onRequest`/`onResponse`/`onError` hooks; registered in `index.ts` |
+
+---
+
+### 9.2 Redis key registry
+
+Every Redis key used in the server. **Do not invent new key formats without adding them here.**
+
+| Key pattern | TTL | Type | Owner module | Purpose |
+|-------------|-----|------|--------------|---------|
+| `challenge:${username}-registration` | 300 s | string | `registration/index.ts` | WebAuthn registration challenge |
+| `challenge:${username}-authentication` | `bindingChallengeTtlSeconds` (default 300 s) | string | `authentication/index.ts` | WebAuthn authentication challenge |
+| `webauthn-binding-challenge:${username}` | `bindingChallengeTtlSeconds` | string | `authentication/index.ts` | Keystore binding challenge (RFC-0004) |
+| `auth-ratelimit:${userId}` | `bindingChallengeTtlSeconds` | counter (INCR) | `authentication/index.ts` | Per-user auth attempt rate limit |
+
+**Cleanup rule:** call `clearAuthRedisKeys(username)` (internal to `authentication/index.ts`) at **every** exit path of `verifyAuthentication` — success, all failure branches, and rate-limit. Missing a branch leaves a stale challenge in Redis.
+
+---
+
+### 9.3 HTTP endpoint contract
+
+| Method | Path | Request identity | Body / notes |
+|--------|------|-----------------|--------------|
+| GET | `/health` | — | Returns `{ status: "ok" }` |
+| POST | `/generate-registration-options` | — | Body: `{ username: string }` |
+| POST | `/verify-registration` | `x-username` header | Body: `RegistrationResponseJSON` |
+| POST | `/generate-authentication-options` | `x-username` header | Body: `{}` (empty); response includes extra `bindingChallenge` field |
+| POST | `/verify-authentication` | `x-username` header | Body: `VerifyAuthenticationBody` (see §9.4) |
+| POST | `/register-keystore-binding` | `x-username` header | Body: `{ publicKeySpkiB64: string; algorithm: "P-256" \| "Ed25519" }` |
+| GET | `/.well-known/assetlinks.json` | — | Android Digital Asset Links |
+| GET | `/.well-known/apple-app-site-association` | — | iOS Associated Domains |
+
+**Convention:** user identity always travels as `x-username` header, never in the body (except `/generate-registration-options` which has no authenticated session yet).
+
+---
+
+### 9.4 Cross-boundary types (server ↔ app — keep in sync)
+
+These types span the HTTP boundary. Changing either side without updating the other is a silent contract break.
+
+**`VerifyAuthenticationBody`** (server: `authentication/index.ts`)
+```ts
+AuthenticationResponseJSON & {
+  binding?: ClientBindingPayload;
+  bindingUnlockHint?: "biometric" | "device_credential" | null;
+}
+```
+
+**`ClientBindingPayload`** (server: `authentication/index.ts` / app: `services/api.ts`)
+```ts
+{ challenge: string; signature: string; algorithm?: string }
+| { status: "lost" }
+```
+
+**`verifyAuthentication` response** (app reads these fields)
+```ts
+{ verified: boolean; authAttemptId: string; biometryBindingStatus: string;
+  suspiciousActivity: boolean; blockReason?: "binding_lost" | "pin_unlock" }
+```
+
+**`generateAuthenticationOptions` response** — server appends `bindingChallenge: string` to the standard WebAuthn options object. **The app must destructure and strip `bindingChallenge` before passing options to `Passkey.get()`** — passing it through causes WebAuthn validation failure.
+
+---
+
+### 9.5 App module map (`passkeys-app/`)
+
+| File | Purpose | Rule |
+|------|---------|------|
+| `app/index.tsx` | Public entry — register + sign-in screen (Calm Card) | Only file that may import `react-native-passkey` and `services/keystoreBinding.ts` |
+| `app/home.tsx` | Authenticated screen (Home Proof) | Navigation target after successful passkey ceremony |
+| `app/second.tsx` | Reserved / PoC screen | Do not use as passkey flow target |
+| `app/third.tsx` | Reserved / PoC screen | Do not use as passkey flow target |
+| `app/_layout.tsx` | Root Stack + Theme layout | Modify only when layout changes are required |
+| `app/(tabs)/index.tsx` | Generic tab — not part of passkey flow | **Forbidden** as post-login navigation target (causes route ambiguity) |
+| `app/(tabs)/explore.tsx` | Generic tab | Outside passkey flow |
+| `app/+not-found.tsx` | 404 handler | Outside passkey flow |
+| `services/api.ts` | All HTTP calls to the server | Only file that calls `fetch`; all screens must go through it. Internal helper: `postJSON(path, body?, headers?)` — use it for any new endpoint, do not call `fetch` directly |
+| `services/keystoreBinding.ts` | Android Keystore native bridge | Exports: `isKeystoreBindingAvailable()`, `createKeystoreBindingKey()`, `signKeystoreBindingChallenge(challenge)`. Do not duplicate in a new file |
+
+---
+
+### 9.6 Android Keystore binding flow (RFC-0004)
+
+Registration side (`app/index.tsx → runRegister`):
+1. After `verifyRegistration` succeeds and `Platform.OS === ‘android’ && isKeystoreBindingAvailable()`
+2. Call `createKeystoreBindingKey()` → get `{ publicKeySpkiB64 }`
+3. Call `registerKeystoreBinding(username, { publicKeySpkiB64, algorithm: "P-256" })`
+4. Failure is non-fatal (warn in DEV, continue to home)
+
+Authentication side (`app/index.tsx → runLogin`):
+1. `generateAuthenticationOptions` → destructure `{ bindingChallenge, ...passkeyOptions }`
+2. If Android + binding available + `bindingChallenge` present: call `signKeystoreBindingChallenge(bindingChallenge)`
+3. Build `bindingPayload` (`{ challenge, signature, algorithm: "ES256" }` or `{ status: "lost" }`) from sign result
+4. Pass `passkeyOptions` (without `bindingChallenge`) to `Passkey.get()`
+5. Pass `bindingPayload` + `bindingUnlockHint` as extras to `verifyAuthentication`
+
+---
