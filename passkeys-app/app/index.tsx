@@ -225,25 +225,29 @@ export default function IndexScreen() {
       if (Platform.OS === 'android' && isKeystoreBindingAvailable() && bindingChallenge) {
         setMessage('Keystore binding sign…');
         setTone('info');
-        const br = await signKeystoreBindingChallenge(bindingChallenge);
-        if (typeof __DEV__ !== 'undefined' && __DEV__) {
-          if (br.status === 'ok') {
-            console.log('[keystore] sign', { status: 'ok', unlockHint: br.unlockHint });
-          } else if (br.status === 'lost') {
-            console.log('[keystore] sign', { status: 'lost' });
-          } else {
-            console.log('[keystore] sign', { status: br.status, detail: 'message' in br ? br.message : undefined });
+        try {
+          const br = await signKeystoreBindingChallenge(bindingChallenge);
+          if (typeof __DEV__ !== 'undefined' && __DEV__) {
+            if (br.status === 'ok') {
+              console.log('[keystore] sign', { status: 'ok', unlockHint: br.unlockHint });
+            } else if (br.status === 'lost') {
+              console.log('[keystore] sign', { status: 'lost' });
+            } else {
+              console.warn('[keystore] sign error', { status: br.status, detail: 'message' in br ? br.message : undefined });
+            }
           }
-        }
-        if (br.status === 'ok') {
-          bindingPayload = {
-            challenge: bindingChallenge,
-            signature: br.signature,
-            algorithm: 'ES256',
-          };
-          bindingUnlockHint = br.unlockHint;
-        } else if (br.status === 'lost') {
-          bindingPayload = { status: 'lost' };
+          if (br.status === 'ok') {
+            bindingPayload = {
+              challenge: bindingChallenge,
+              signature: br.signature,
+              algorithm: 'ES256',
+            };
+            bindingUnlockHint = br.unlockHint;
+          } else if (br.status === 'lost') {
+            bindingPayload = { status: 'lost' };
+          }
+        } catch (bindErr) {
+          console.warn('[keystore] signChallenge threw', bindErr);
         }
       }
       setMessage('Android will ask you to confirm with fingerprint, face, or screen lock.');
