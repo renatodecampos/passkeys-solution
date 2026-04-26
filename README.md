@@ -22,13 +22,9 @@ It is also a **structured engineering experiment**: the entire development was o
 
 ## Demo
 
-**RFC-0004 — Android Keystore binding: biometric enrollment audit**
-
 <video src="demos/demo-rfc-0004.mp4" controls width="320"></video>
 
-**RFC-0003 — Visual identity: app icon, splash screen, Light Clean theme**
-
-![Demo — RFC-0003: visual identity on Android](demos/demo-rfc-0003.gif)
+![Demo — RFC-0004: Android Keystore binding: biometric enrollment audit](demos/demo-rfc-0004.gif)
 
 ---
 
@@ -39,6 +35,7 @@ It is also a **structured engineering experiment**: the entire development was o
 - **HTTPS locally** — self-signed certificate via `mkcert`; no paid cert required for development
 - **Android support** — native passkey flow via `react-native-passkey` on API 34+ emulator
 - **Demo UX (RFC-0002)** — Calm Card entry, keyboard-safe form, inline status messages, “Home Proof” screen summarizing server verification
+- **Keystore binding audit (RFC-0004)** — Android app-managed Keystore key detects biometric enrollment changes; per-attempt audit log in MongoDB; configurable policies (block on binding lost, PIN unlock, rate limiting)
 - **100% statement coverage** on the server, 84% branch coverage (threshold: 80%)
 - **Session security** — signed cookies, Helmet headers, CORS, rate limiting
 
@@ -151,6 +148,12 @@ cp passkeys-server/.env-example passkeys-server/.env
 | `SESSION_SECRET` | Secret for signed cookies |
 | `ANDROID_CERT_FINGERPRINT` | SHA-256 of the Android debug keystore |
 | `ANDROID_ORIGIN` | Android WebAuthn origin (`android:apk-key-hash:<base64>`) |
+| `AUTH_DENY_ON_BINDING_LOST` | `true` blocks sign-in when Keystore binding is lost (RFC-0004) |
+| `AUTH_DENY_ON_BINDING_PIN_UNLOCK` | `true` blocks sign-in when binding key was unlocked via PIN instead of biometric (RFC-0004) |
+| `AUTH_RATE_LIMIT_MAX` | Max auth attempts per userId per 5-min window before 429 (default `3`) |
+| `AUTH_ATTEMPTS_COLLECTION` | MongoDB collection for per-attempt audit log (default `auth_attempts`) |
+| `KEYSTORE_BINDING_COLLECTION` | MongoDB collection for binding public keys (default `keystore_binding`) |
+| `BINDING_CHALLENGE_TTL_SECONDS` | TTL for binding challenge in Redis (default `300`) |
 
 To get `ANDROID_CERT_FINGERPRINT`:
 
@@ -235,6 +238,8 @@ This project was built entirely by AI agents coordinated through a **file-based 
 - [`CLAUDE.md`](CLAUDE.md) — onboarding for any new agent (or developer)
 - [`rfcs/completed/RFC-0001`](rfcs/completed/RFC-0001-passkeys-poc-completion.md) — base PoC specification
 - [`rfcs/completed/RFC-0002`](rfcs/completed/RFC-0002-ux-passkeys-poc.md) — Android UX evolution (completed)
+- [`rfcs/completed/RFC-0003`](rfcs/completed/RFC-0003-visual-identity.md) — visual identity: app icon, splash, Light Clean theme (completed)
+- [`rfcs/completed/RFC-0004`](rfcs/completed/RFC-0004-android-keystore-auth-audit-biometry-signal.md) — Android Keystore binding + biometric audit (completed)
 - [`tasks/`](tasks/README.md) — phase execution status
 
 **[Read the full presentation →](docs/harness-presentation.md)**
@@ -269,6 +274,15 @@ This project was built entirely by AI agents coordinated through a **file-based 
 | 2 | `app.json` configuration | ✅ completed |
 | 3 | Device validation | ✅ completed |
 | 4 | Documentation | ✅ completed |
+
+**RFC-0004** (Android Keystore binding + biometric audit)
+
+| Phase | Description | Status |
+|---|---|---|
+| 1 | Server: `auth_attempts` audit log + Keystore binding verify | ✅ completed |
+| 2 | Android: native Keystore module + client payload | ✅ completed |
+| 3 | Documentation + RFC in `rfcs/completed/` | ✅ completed |
+| 4 | Hardening: rate limiting, `revokedAt` history, PIN block policy | ✅ completed |
 
 ---
 

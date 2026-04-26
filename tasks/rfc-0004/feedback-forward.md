@@ -20,7 +20,7 @@
 | `passkeys-server/tsconfig.json` (or new-dev checklist) | Require `outDir: dist` + `rootDir: src` so `src` never contains emitted `.js`. |
 | Jest / CLAUDE | Note that `collectCoverageFrom` `*.ts` is wrong if Jest loads co-located `*.js` in `src/`. |
 
-**Applied?** `[ ]` Pending documentation phase
+**Applied?** `[x]` Applied in phase 3 — `CLAUDE.md` updated with tsconfig note; `tasks/feedback-forward.md` updated.
 
 ---
 
@@ -59,5 +59,24 @@
 | File | Change |
 |------|--------|
 | `_template-fase.md` | Add reminder to fill Phase 2 Notes/Feedback Forward before starting Phase 3 (they were left blank). |
+
+**Applied?** `[ ]` Template update deferred.
+
+---
+
+## Phase 4 — Hardening (rate limit, revokedAt, PIN block)
+
+**What went well**  
+- All three hardening items were independent — implemented in a single session with no merge conflicts or ordering issues.
+- `revokedAt` history design (query only `{ revokedAt: { $exists: false } }`) required no API contract changes and no client updates.
+- PIN blocking is purely server-side — `bindingUnlockHint: "device_credential"` check in `evaluateBinding` required no native Android changes.
+
+**What caused friction / rework**  
+- PIN blocking path (4.3) is structurally unreachable on API 30+ emulators: `BiometricPrompt` with `BIOMETRIC_STRONG` never surfaces `device_credential` unlock, so the feature cannot be exercised in the standard test environment.
+
+**Suggested harness updates**  
+| File | Change |
+|------|--------|
+| `_template-fase.md` | When a subtask is emulator-unreachable, tag it `[emulator-only]` and clarify what "green" means without manual device confirmation. |
 
 **Applied?** `[ ]` Template update deferred.

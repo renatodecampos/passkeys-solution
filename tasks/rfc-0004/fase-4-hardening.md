@@ -507,19 +507,21 @@ _No blockers recorded._
 ## Feedback Forward
 
 ### What went well
--
+- Three hardening items (rate limit, revokedAt, PIN block) had no interdependencies — spec parallelism map was accurate and all three implemented in a single commit.
+- PIN blocking policy (4.3) required no client-side native changes — server-side `bindingUnlockHint` check was sufficient.
+- `revokedAt` design (insert history, query active) required only a small DB layer refactor with no API contract changes.
 
 ### What caused friction / rework
--
+- PIN blocking (4.3) is unreachable in practice on API 30+ because `BiometricPrompt` with `BIOMETRIC_STRONG` never produces `device_credential` unlock — the code path is implemented but not exercisable on the test emulator.
 
 ### Suggested harness updates
 
 | File | Section | Suggested change |
 |------|---------|------------------|
-| | | |
+| `_template-fase.md` | Subtask template | When a subtask is PoC-only / unreachable on test hardware, tag it `[emulator-only]` and note in verification what "green" means without manual device confirmation. |
 
 ### Applied?
-`[ ]`
+`[ ]` Template update deferred (same pattern as Phase 3 suggestion).
 
 ---
 

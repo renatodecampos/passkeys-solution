@@ -31,8 +31,9 @@
 | (session) | 2026-04-25 — app troubleshooting / Expo / .env / Android TLS | Cursor | ~172k | 86% ⚠️ |
 | RFC-0004 | 1 | Cursor | ~113k | 56% |
 | RFC-0004 | 2+3 | Claude Code (Sonnet 4.6) | — | — |
+| RFC-0004 | 4 | Claude Code (Sonnet 4.6) | — | — |
 
-**Total tokens tracked:** ~1014k — RFC-0002: phase 1 (~78.6k) + phase 2 (~109k) + phase 3 (~75.3k); RFC-0003: phase 1 (~60k) + phase 2 (~51.5k) + phase 3 (~172k, **86%** ⚠️) + phase 4 (~73.9k); RFC-0004 phase 1 (~113k, 56%); session 2026-04-25 (~172k, **86%** ⚠️); RFC-0001 all phases still "—" where not reported. (Approximate; sums rounded.)
+**Total tokens tracked:** ~1014k — RFC-0002: phase 1 (~78.6k) + phase 2 (~109k) + phase 3 (~75.3k); RFC-0003: phase 1 (~60k) + phase 2 (~51.5k) + phase 3 (~172k, **86%** ⚠️) + phase 4 (~73.9k); RFC-0004 phase 1 (~113k, 56%); phases 2–4 not reported; session 2026-04-25 (~172k, **86%** ⚠️); RFC-0001 all phases still "—" where not reported. (Approximate; sums rounded.)
 
 ---
 
